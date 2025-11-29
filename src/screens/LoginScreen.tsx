@@ -282,19 +282,16 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
-  } as const,
+  },
   linkText: {
     color: '#1a73e8',
     textAlign: 'center',
     fontSize: 14,
-  } as const,
+  },
   errorText: {
     color: '#d32f2f',
     textAlign: 'center',
     marginBottom: 15,
-    fontSize: 14
-  }
-});
     fontSize: 14,
-  } as const,
+  },
 });

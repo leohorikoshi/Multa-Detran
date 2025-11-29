@@ -202,6 +202,8 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) =>
           />
         </FormGroup>
       </FormContainer>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };

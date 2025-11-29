@@ -123,17 +123,6 @@ export const processImages = async (
     // Atualizar req.files com os novos nomes de arquivo
     req.processedImages = processedFiles;
     next();
-
-      // Remover arquivo original
-      await fs.unlink(filepath);
-
-      // Atualizar informações do arquivo
-      processedFiles.push(outputFilename);
-    }
-
-    // Atualizar req.files com os novos nomes de arquivo
-    req.processedImages = processedFiles;
-    next();
   } catch (error) {
     next(error);
   }

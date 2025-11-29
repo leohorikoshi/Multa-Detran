@@ -1,4 +1,9 @@
-export const API_BASE_URL = 'https://api.detrandenuncia.gov.br'; // TODO: Atualizar com URL correta
+// Configuração da API
+// Para desenvolvimento local, use: http://localhost:3000/api
+// Para produção, use a URL do servidor
+export const API_BASE_URL = __DEV__ 
+  ? 'http://localhost:3000/api'
+  : 'https://api.detrandenuncia.gov.br/api';
 
 export const VIOLATION_TYPES = [
   'Estacionamento irregular',
