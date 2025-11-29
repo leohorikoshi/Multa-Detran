@@ -32,9 +32,16 @@ yarn-error.*
 
 # local env files
 .env*.local
+.env
+backend/.env
+backend/uploads/
 
 # typescript
 *.tsbuildinfo
+
+# test coverage
+coverage/
+.jest/
 
 # generated native folders
 /ios

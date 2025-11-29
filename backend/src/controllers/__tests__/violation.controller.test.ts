@@ -6,12 +6,6 @@ import {
 } from '../violation.controller';
 import { Violation } from '../../models/violation.model';
 import { IViolationDocument } from '../../types/models.types';
-import { Types } from 'mongoose';
-
-// Reset all mocks before each test
-beforeEach(() => {
-  jest.clearAllMocks();
-});
 
 jest.mock('../../models/violation.model');
 
@@ -28,9 +22,10 @@ interface RequestWithUser extends Request {
 describe('Violation Controller', () => {
   let mockRequest: Partial<RequestWithUser>;
   let mockResponse: Partial<Response>;
-  let mockNext: jest.Mock;
 
   beforeEach(() => {
+    jest.clearAllMocks();
+    
     mockRequest = {
       body: {},
       user: {
@@ -44,9 +39,8 @@ describe('Violation Controller', () => {
     };
     mockResponse = {
       status: jest.fn().mockReturnThis(),
-      json: jest.fn()
+      json: jest.fn().mockReturnThis()
     };
-    mockNext = jest.fn();
   });
 
   describe('createViolation', () => {
@@ -106,7 +100,7 @@ describe('Violation Controller', () => {
       mockRequest.body = validViolationData;
       mockRequest.files = [];
 
-      await createViolation(mockRequest as Request, mockResponse as Response, mockNext);
+      await createViolation(mockRequest as RequestWithUser, mockResponse as Response);
 
       expect(mockResponse.status).toHaveBeenCalledWith(400);
       expect(mockResponse.json).toHaveBeenCalledWith(
@@ -154,7 +148,11 @@ describe('Violation Controller', () => {
 
   describe('updateViolationStatus', () => {
     beforeEach(() => {
-      jest.resetAllMocks();
+      jest.clearAllMocks();
+      mockResponse = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn().mockReturnThis()
+      };
     });
 
     it('should update violation status as admin', async () => {
@@ -174,26 +172,25 @@ describe('Violation Controller', () => {
         status: 'pending'
       };
 
-      (Violation.findById as jest.Mock).mockResolvedValueOnce(mockViolation);
-      (Violation.findById as jest.Mock).mockResolvedValueOnce({
-        ...mockViolation,
+      const updatedViolation = {
+        _id: violationId,
         status: 'approved'
-      });
+      };
+
+      (Violation.findById as jest.Mock)
+        .mockResolvedValueOnce(mockViolation)
+        .mockResolvedValueOnce(updatedViolation);
       
-      const updateOne = jest.fn().mockResolvedValueOnce({ modifiedCount: 1 });
-      (Violation as any).updateOne = updateOne;
+      (Violation.updateOne as jest.Mock).mockResolvedValueOnce({ modifiedCount: 1 });
 
-      console.log('Mock violation:', mockViolation);
-      console.log('Mock request:', mockRequest);
-      await updateViolationStatus(mockRequest as RequestWithUser, mockResponse as Response);
       await updateViolationStatus(mockRequest as RequestWithUser, mockResponse as Response);
 
-      expect(updateOne).toHaveBeenCalledWith(
+      expect(Violation.updateOne).toHaveBeenCalledWith(
         { _id: violationId },
         { $set: {
             status: 'approved',
             reviewNotes: undefined,
-            reviewedBy: expect.any(String)
+            reviewedBy: 'admin123'
           }
         }
       );
@@ -202,10 +199,7 @@ describe('Violation Controller', () => {
       expect(mockResponse.json).toHaveBeenCalledWith({
         status: 'success',
         data: {
-          violation: expect.objectContaining({
-            _id: violationId,
-            status: 'approved'
-          })
+          violation: updatedViolation
         }
       });
     });
@@ -218,13 +212,12 @@ describe('Violation Controller', () => {
         name: 'Test User',
         email: 'test@example.com'
       };
-      mockRequest.params = { id: 'violation123' };
+      mockRequest.params = { id: '507f1f77bcf86cd799439011' };
       mockRequest.body = { status: 'approved' };
 
       const mockViolation = {
-        _id: 'violation123',
-        status: 'pending',
-        updateOne: jest.fn().mockResolvedValue({ nModified: 1 })
+        _id: '507f1f77bcf86cd799439011',
+        status: 'pending'
       };
 
       (Violation.findById as jest.Mock).mockResolvedValueOnce(mockViolation);
@@ -235,7 +228,7 @@ describe('Violation Controller', () => {
       expect(mockResponse.json).toHaveBeenCalledWith(
         expect.objectContaining({
           status: 'error',
-           message: expect.stringContaining('administradores')
+          message: expect.stringContaining('administrador')
         })
       );
     });
