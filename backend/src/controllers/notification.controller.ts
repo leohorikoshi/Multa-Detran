@@ -1,12 +1,23 @@
-import { Request, Response } from 'express';
+import { Response, Request } from 'express';
 import * as NotificationService from '../services/notification.service';
 import { PushToken } from '../models/pushToken.model';
+
+// Extend Express Request type to include user
+interface AuthRequest extends Request {
+  user?: {
+    id: string;
+    _id: string;
+    role: string;
+    name: string;
+    email: string;
+  };
+}
 
 /**
  * POST /api/notifications/register-token
  * Registra um token de push notification para o usuário
  */
-export const registerPushToken = async (req: Request, res: Response): Promise<void> => {
+export const registerPushToken = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const userId = req.user?.id;
     const { token, platform, deviceId } = req.body;
@@ -60,7 +71,7 @@ export const registerPushToken = async (req: Request, res: Response): Promise<vo
  * POST /api/notifications/unregister-token
  * Remove um token de push notification
  */
-export const unregisterPushToken = async (req: Request, res: Response): Promise<void> => {
+export const unregisterPushToken = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { token } = req.body;
 
@@ -92,7 +103,7 @@ export const unregisterPushToken = async (req: Request, res: Response): Promise<
  * GET /api/notifications/tokens
  * Lista todos os tokens do usuário autenticado
  */
-export const getUserTokens = async (req: Request, res: Response): Promise<void> => {
+export const getUserTokens = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const userId = req.user?.id;
 
@@ -127,7 +138,7 @@ export const getUserTokens = async (req: Request, res: Response): Promise<void> 
  * POST /api/notifications/send-test
  * Envia notificação de teste (apenas para desenvolvimento)
  */
-export const sendTestNotification = async (req: Request, res: Response): Promise<void> => {
+export const sendTestNotification = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const userId = req.user?.id;
 
@@ -171,7 +182,7 @@ export const sendTestNotification = async (req: Request, res: Response): Promise
  * DELETE /api/notifications/tokens/:tokenId
  * Remove um token específico
  */
-export const deleteToken = async (req: Request, res: Response): Promise<void> => {
+export const deleteToken = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const userId = req.user?.id;
     const { tokenId } = req.params;

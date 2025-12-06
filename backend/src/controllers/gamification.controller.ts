@@ -1,8 +1,19 @@
-import { Request, Response } from 'express';
+import { Response, Request } from 'express';
 import * as GamificationService from '../services/gamification.service';
 
+// Extend Express Request type to include user
+interface AuthRequest extends Request {
+  user?: {
+    id: string;
+    _id: string;
+    role: string;
+    name: string;
+    email: string;
+  };
+}
+
 // GET /api/gamification/stats
-export const getUserStats = async (req: Request, res: Response): Promise<void> => {
+export const getUserStats = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const userId = req.user?.id;
     if (!userId) {
@@ -29,7 +40,7 @@ export const getLeaderboard = async (req: Request, res: Response): Promise<void>
 };
 
 // POST /api/gamification/share
-export const recordShare = async (req: Request, res: Response): Promise<void> => {
+export const recordShare = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const userId = req.user?.id;
     if (!userId) {

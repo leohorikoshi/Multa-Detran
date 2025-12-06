@@ -1,11 +1,11 @@
 import { Router } from 'express';
 import * as notificationController from '../controllers/notification.controller';
-import { authenticateToken } from '../middleware/auth.middleware';
+import { protect } from '../middleware/auth.middleware';
 
 const router = Router();
 
 // Todas as rotas de notificação requerem autenticação
-router.use(authenticateToken);
+router.use(protect);
 
 /**
  * @route   POST /api/notifications/register-token

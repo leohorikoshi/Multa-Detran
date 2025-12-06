@@ -1,10 +1,10 @@
 import { Router } from 'express';
 import * as gamificationController from '../controllers/gamification.controller';
-import { authenticateToken } from '../middleware/auth.middleware';
+import { protect } from '../middleware/auth.middleware';
 
 const router = Router();
 
-router.use(authenticateToken);
+router.use(protect);
 
 router.get('/stats', gamificationController.getUserStats);
 router.get('/leaderboard', gamificationController.getLeaderboard);
