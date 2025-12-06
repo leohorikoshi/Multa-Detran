@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react';
 import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
 import { Navigation } from './src/navigation';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { store } from './src/store';
-import { Platform, Linking } from 'react-native';
+import { store, persistor } from './src/store';
+import { Platform, Linking, ActivityIndicator, View } from 'react-native';
 import { ThemeProvider } from './src/contexts/ThemeContext';
 import * as Notifications from 'expo-notifications';
 
@@ -75,11 +76,20 @@ export default function App() {
 
   return (
     <Provider store={store}>
-      <ThemeProvider>
-        <SafeAreaProvider>
-          <Navigation />
-        </SafeAreaProvider>
-      </ThemeProvider>
+      <PersistGate 
+        loading={
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <ActivityIndicator size="large" color="#1E88E5" />
+          </View>
+        } 
+        persistor={persistor}
+      >
+        <ThemeProvider>
+          <SafeAreaProvider>
+            <Navigation />
+          </SafeAreaProvider>
+        </ThemeProvider>
+      </PersistGate>
     </Provider>
   );
 }

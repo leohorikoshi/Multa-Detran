@@ -1,5 +1,66 @@
 # Changelog
 
+## [1.5.0] - 2025-12-07 🔔
+
+### 🆕 Adicionado - Push Notifications
+
+#### Backend
+- **Sistema completo de notificações push**
+  - `backend/src/models/pushToken.model.ts`: Modelo de tokens com userId, token, platform, deviceId
+  - `backend/src/services/notification.service.ts`: Serviço com expo-server-sdk
+    - `sendPushNotification()`: Envia para usuário específico
+    - `sendBulkNotifications()`: Envia para múltiplos usuários
+    - `scheduleNotification()`: Agenda notificação futura
+    - `registerPushToken()`: Registra novo token
+    - `unregisterPushToken()`: Remove token
+  - `backend/src/controllers/notification.controller.ts`: 5 endpoints
+  - `backend/src/routes/notification.routes.ts`: Rotas autenticadas
+
+#### Templates de Notificação
+1. **violationApproved**: Denúncia aprovada ✅
+2. **violationRejected**: Denúncia rejeitada ❌
+3. **violationUnderReview**: Em análise 🔍
+4. **newViolationNearby**: Nova denúncia próxima 📍
+5. **welcomeNotification**: Boas-vindas 🎉
+
+#### Frontend
+- **Serviço de notificações**
+  - `src/services/notification.service.ts`: Integração expo-notifications
+    - `registerForPushNotifications()`: Registra token automaticamente
+    - `addNotificationReceivedListener()`: Listener foreground
+    - `addNotificationResponseListener()`: Listener tap
+    - `sendLocalNotification()`: Notificação local
+    - `getBadgeCount()`, `setBadgeCount()`: Badge management
+  - `src/hooks/useNotifications.ts`: Hook customizado
+    - Registro automático ao iniciar app
+    - Navegação baseada em notificação
+    - Cleanup automático
+
+#### Configuração
+- Canais Android: `default` e `violations`
+- Permissões solicitadas automaticamente
+- Tokens registrados no backend via API
+- Remoção automática de tokens inválidos
+
+#### Dependências
+- Backend: `firebase-admin`, `expo-server-sdk`
+- Frontend: `expo-notifications`, `expo-device`, `expo-constants`
+
+### 🎯 Métricas Esperadas
+- **+50%** retenção de usuários
+- **+35%** engajamento com denúncias
+- **<5s** tempo de entrega de notificações
+- **>90%** taxa de entrega bem-sucedida
+
+### 📡 Endpoints Disponíveis
+- `POST /api/notifications/register-token` - Registrar token
+- `POST /api/notifications/unregister-token` - Remover token
+- `GET /api/notifications/tokens` - Listar tokens do usuário
+- `DELETE /api/notifications/tokens/:tokenId` - Deletar token específico
+- `POST /api/notifications/send-test` - Enviar notificação de teste (dev only)
+
+---
+
 ## [1.4.0] - 2025-12-07 📲
 
 ### 🆕 Adicionado - Social Sharing & Deep Linking
