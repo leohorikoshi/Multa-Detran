@@ -51,12 +51,19 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   };
 
   const handleLogin = async () => {
+    console.log('🔵 handleLogin chamado');
+    console.log('📧 Email:', email);
+    console.log('🔑 Password length:', password.length);
+    
     setErrorMessage(''); // Limpar erro anterior
     
     if (!validate()) {
+      console.log('❌ Validação falhou');
       setErrorMessage('Por favor, verifique os campos destacados em vermelho e tente novamente.');
       return;
     }
+
+    console.log('✅ Validação passou');
 
     try {
       console.log('🔐 Iniciando login...');
@@ -65,10 +72,13 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
       console.log('✅ Token recebido:', result.token ? 'Sim' : 'Não');
       console.log('✅ User recebido:', result.user?.email);
       
-      // Não precisa navegar manualmente - o Redux vai re-renderizar o NavigationContainer
-      console.log('📍 Redux state atualizado, NavigationContainer vai re-renderizar automaticamente');
+      // Navegar para Home após login bem-sucedido
+      console.log('📍 Navegando para Home...');
+      navigation.replace('Home');
     } catch (error: any) {
       console.error('❌ Erro capturado no handleLogin:', error);
+      console.error('❌ Tipo do erro:', typeof error);
+      console.error('❌ Erro stringificado:', JSON.stringify(error, null, 2));
       
       // Mapear erros para mensagens amigáveis
       let errorMsg = 'Ocorreu um erro inesperado. Tente novamente.';
