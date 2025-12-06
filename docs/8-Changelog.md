@@ -1,4 +1,49 @@
 # Changelog
+
+## [1.3.0] - 2025-12-06 🌓
+
+### 🆕 Adicionado - Dark Mode & Settings
+
+#### Frontend
+- **Sistema completo de temas (Light/Dark Mode)**
+  - `src/constants/colors.ts`: Paleta completa para light e dark mode
+  - `src/contexts/ThemeContext.tsx`: Context API com persistência
+  - Suporte a 3 modos: Light, Dark, Auto (segue sistema)
+  - Persistência com AsyncStorage
+  - Transições suaves entre temas
+  - Contraste WCAG AA (4.5:1) garantido
+
+- **Tela de Configurações**
+  - `src/screens/SettingsScreen.tsx`: Nova tela com toggle de tema
+  - Preview visual de cada tema
+  - Seleção entre Light/Dark/Auto
+  - Indicador de tema atual
+  - Seção "Sobre" com versão do app
+
+#### Navegação
+- Rota `Settings` adicionada ao stack autenticado
+- Botão ⚙️ no header do HomeScreen
+- Header de configurações estilizado
+
+#### Infraestrutura
+- ThemeProvider integrado ao App.tsx
+- Dependências instaladas: `@react-native-async-storage/async-storage`, `expo-system-ui`
+
+### 📚 Documentação
+- `docs/ROADMAP-MELHORIAS.md`: Roadmap completo de 10 melhorias em 5 sprints
+  - Checklists detalhados para cada melhoria
+  - Estimativas de tempo e esforço
+  - Métricas de sucesso e KPIs
+  - Cronograma sugerido
+  - Processo de revisão pós-sprint
+
+### 🎯 Métricas Esperadas (Dark Mode)
+- **+25%** satisfação dos usuários
+- **>60%** taxa de adoção do dark mode
+- **0%** degradação de performance
+- **1-2 dias** tempo de implementação
+
+---
  
 ## [1.2.0] - 2025-12-06 🛡️
 

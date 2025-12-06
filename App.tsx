@@ -4,6 +4,7 @@ import { Navigation } from './src/navigation';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { store } from './src/store';
 import { Platform } from 'react-native';
+import { ThemeProvider } from './src/contexts/ThemeContext';
 
 // Importar estilos CSS para web
 if (Platform.OS === 'web') {
@@ -33,9 +34,11 @@ export default function App() {
 
   return (
     <Provider store={store}>
-      <SafeAreaProvider>
-        <Navigation />
-      </SafeAreaProvider>
+      <ThemeProvider>
+        <SafeAreaProvider>
+          <Navigation />
+        </SafeAreaProvider>
+      </ThemeProvider>
     </Provider>
   );
 }

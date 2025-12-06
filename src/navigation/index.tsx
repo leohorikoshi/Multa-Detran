@@ -14,6 +14,7 @@ import { RegisterScreen } from '../screens/RegisterScreen';
 import { HomeScreen } from '../screens/HomeScreen';
 import { ReportViolationScreen } from '../screens/ReportViolationScreen';
 import { MyReportsScreen } from '../screens/MyReportsScreen';
+import SettingsScreen from '../screens/SettingsScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -70,6 +71,18 @@ export const Navigation = () => {
               options={{
                 headerShown: true,
                 headerTitle: 'Minhas Denúncias',
+                headerTintColor: '#fff',
+                headerStyle: {
+                  backgroundColor: '#1a73e8',
+                },
+              }}
+            />
+            <Stack.Screen
+              name="Settings"
+              component={SettingsScreen}
+              options={{
+                headerShown: true,
+                headerTitle: 'Configurações',
                 headerTintColor: '#fff',
                 headerStyle: {
                   backgroundColor: '#1a73e8',
