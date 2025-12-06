@@ -7,19 +7,24 @@ import {
   Image,
   Alert,
   ActivityIndicator,
+  TouchableOpacity,
 } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 import { Violation } from '../types/models';
 import api from '../utils/api';
 import { formatDate } from '../utils/format';
 import { ViolationStatus } from '../components/ui/ViolationStatus';
 import { Button, FormInput } from '../components/ui';
+import { ShareModal } from '../components/share/ShareModal';
+import type { ShareViolationData } from '../utils/shareService';
 
 export const ViolationDetailsScreen = () => {
   const [violation, setViolation] = useState<Violation | null>(null);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [reviewNotes, setReviewNotes] = useState('');
+  const [shareModalVisible, setShareModalVisible] = useState(false);
   const route = useRoute();
   const navigation = useNavigation();
   const { violationId } = route.params as { violationId: string };
@@ -72,11 +77,28 @@ export const ViolationDetailsScreen = () => {
     );
   }
 
+  const shareData: ShareViolationData = {
+    id: violation._id,
+    type: violation.type,
+    location: violation.location.address,
+    date: violation.createdAt,
+    imageUrl: violation.images[0] || '',
+  };
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.plateNumber}>{violation.plateNumber}</Text>
-        <ViolationStatus status={violation.status} />
+        <View style={styles.headerLeft}>
+          <Text style={styles.plateNumber}>{violation.plateNumber}</Text>
+          <ViolationStatus status={violation.status} />
+        </View>
+        <TouchableOpacity
+          onPress={() => setShareModalVisible(true)}
+          style={styles.shareButton}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <Ionicons name="share-social" size={24} color="#1a73e8" />
+        </TouchableOpacity>
       </View>
 
       <View style={styles.infoSection}>
@@ -145,6 +167,12 @@ export const ViolationDetailsScreen = () => {
           <Text style={styles.value}>{violation.reviewNotes}</Text>
         </View>
       )}
+
+      <ShareModal
+        visible={shareModalVisible}
+        onClose={() => setShareModalVisible(false)}
+        violationData={shareData}
+      />
     </ScrollView>
   );
 };
@@ -176,6 +204,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
     backgroundColor: '#f5f5f5',
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  shareButton: {
+    padding: 8,
   },
   plateNumber: {
     fontSize: 20,

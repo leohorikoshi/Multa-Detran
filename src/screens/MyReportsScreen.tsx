@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -7,9 +7,12 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 import { VIOLATION_STATUS } from '../constants';
+import { ShareModal } from '../components/share/ShareModal';
+import type { ShareViolationData } from '../utils/shareService';
 
 type MyReportsScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'MyReports'>;
@@ -22,9 +25,13 @@ type Report = {
   status: keyof typeof VIOLATION_STATUS;
   createdAt: string;
   images: string[];
+  location?: string;
 };
 
 export const MyReportsScreen: React.FC<MyReportsScreenProps> = ({ navigation }) => {
+  const [shareModalVisible, setShareModalVisible] = useState(false);
+  const [selectedReport, setSelectedReport] = useState<Report | null>(null);
+
   // TODO: Substituir por dados reais da API
   const mockReports: Report[] = [
     {
@@ -33,6 +40,7 @@ export const MyReportsScreen: React.FC<MyReportsScreenProps> = ({ navigation }) 
       status: 'pending',
       createdAt: '2025-11-08T10:00:00',
       images: ['https://picsum.photos/200'],
+      location: 'Av. Paulista, 1000 - São Paulo/SP',
     },
     {
       id: '2',
@@ -40,19 +48,34 @@ export const MyReportsScreen: React.FC<MyReportsScreenProps> = ({ navigation }) 
       status: 'reviewing',
       createdAt: '2025-11-07T15:30:00',
       images: ['https://picsum.photos/200'],
+      location: 'Rua Augusta, 500 - São Paulo/SP',
     },
   ];
+
+  const handleShare = (item: Report) => {
+    setSelectedReport(item);
+    setShareModalVisible(true);
+  };
 
   const renderItem = ({ item }: { item: Report }) => (
     <TouchableOpacity style={styles.reportCard}>
       <View style={styles.reportHeader}>
         <Text style={styles.reportType}>{item.violationType}</Text>
-        <Text style={[
-          styles.statusBadge,
-          { backgroundColor: getStatusColor(item.status) }
-        ]}>
-          {VIOLATION_STATUS[item.status]}
-        </Text>
+        <View style={styles.headerActions}>
+          <Text style={[
+            styles.statusBadge,
+            { backgroundColor: getStatusColor(item.status) }
+          ]}>
+            {VIOLATION_STATUS[item.status]}
+          </Text>
+          <TouchableOpacity
+            onPress={() => handleShare(item)}
+            style={styles.shareIconButton}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <Ionicons name="share-social-outline" size={20} color="#1a73e8" />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <View style={styles.imageRow}>
@@ -98,6 +121,20 @@ export const MyReportsScreen: React.FC<MyReportsScreenProps> = ({ navigation }) 
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.list}
       />
+
+      {selectedReport && (
+        <ShareModal
+          visible={shareModalVisible}
+          onClose={() => setShareModalVisible(false)}
+          violationData={{
+            id: selectedReport.id,
+            type: selectedReport.violationType,
+            location: selectedReport.location || 'Local não informado',
+            date: selectedReport.createdAt,
+            imageUrl: selectedReport.images[0] || '',
+          }}
+        />
+      )}
     </View>
   );
 };
@@ -135,6 +172,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 10,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  shareIconButton: {
+    padding: 4,
   },
   reportType: {
     fontSize: 16,

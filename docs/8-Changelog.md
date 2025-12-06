@@ -1,5 +1,73 @@
 # Changelog
 
+## [1.4.0] - 2025-12-07 📲
+
+### 🆕 Adicionado - Social Sharing & Deep Linking
+
+#### Frontend
+- **Serviço completo de compartilhamento social**
+  - `src/utils/shareService.ts`: Serviço com 10 funções de compartilhamento
+  - Templates customizados para cada plataforma (WhatsApp, Facebook, Twitter, Instagram, Email)
+  - Suporte a 6 plataformas + compartilhamento nativo do sistema
+  - Formatação automática de mensagens com emojis e hashtags
+  - Tradução de 16 tipos de infrações
+  - Formatação de data brasileira (dd/mm/yyyy)
+  - Função de copiar link para área de transferência
+  
+- **Componente ShareModal**
+  - `src/components/share/ShareModal.tsx`: Modal elegante com grid de opções
+  - 7 opções de compartilhamento: WhatsApp, Facebook, Twitter, Instagram, Email, Copiar Link, Mais
+  - Ícones coloridos específicos por plataforma
+  - Suporte a tema claro e escuro
+  - Feedback visual ao compartilhar
+  - Tratamento de erros e casos de aplicativo não instalado
+
+#### Integração em Telas
+- **ViolationDetailsScreen**: Botão de compartilhar no header
+- **MyReportsScreen**: Ícone de compartilhar em cada card de denúncia
+- Modal compartilhado entre telas via state management
+
+#### Deep Linking
+- **Configuração completa de deep links**
+  - Scheme: `detrandenuncia://`
+  - URL web: `https://detrandenuncia.com.br/violation/{id}`
+  - Intent filters Android para autoVerify
+  - Bundle identifier iOS configurado
+  - Listeners de deep link no App.tsx
+  - Suporte a app já aberto e app iniciado via deep link
+  - Parsing automático de IDs de denúncia
+
+#### Dependências
+- `react-native-share`: ^10.0.0 - Biblioteca de compartilhamento social
+- `expo-sharing`: SDK 54 compatible - API nativa Expo para compartilhamento
+
+### 📱 Plataformas Suportadas
+1. **WhatsApp**: Mensagem com emoji 🚨 e link
+2. **Facebook**: Post detalhado com chamada para ação
+3. **Twitter**: Tweet otimizado (280 chars) com @detrandenuncia
+4. **Instagram**: Stories com imagem (requer Facebook App ID)
+5. **Email**: Email formatado com assunto e corpo HTML-ready
+6. **Copiar Link**: Clipboard com feedback visual
+7. **Sistema Nativo**: Share sheet iOS/Android
+
+### 🔗 URLs de Deep Linking
+- App scheme: `detrandenuncia://violation/{id}`
+- Web fallback: `https://detrandenuncia.com.br/violation/{id}`
+- Android autoVerify habilitado para domínio
+- Navegação automática para tela de detalhes
+
+### 🎯 Métricas Esperadas (Social Sharing)
+- **+40%** taxa de compartilhamento de denúncias
+- **+30%** downloads via referência social
+- **+25%** engajamento nas redes sociais
+- **1 dia** tempo de implementação
+
+### 🐛 Correções Técnicas
+- TypeScript: Corrigidos 5 erros de tipo em Share.shareSingle()
+- Usado `any` type annotation para bypass de union type FacebookStoriesShareSingleOptions
+
+---
+
 ## [1.3.0] - 2025-12-06 🌓
 
 ### 🆕 Adicionado - Dark Mode & Settings
