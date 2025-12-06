@@ -1,12 +1,51 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, Component, ErrorInfo, ReactNode } from 'react';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { Navigation } from './src/navigation';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { store, persistor } from './src/store';
-import { Platform, Linking, ActivityIndicator, View } from 'react-native';
+import { Platform, Linking, ActivityIndicator, View, Text } from 'react-native';
 import { ThemeProvider } from './src/contexts/ThemeContext';
 import * as Notifications from 'expo-notifications';
+
+// Error Boundary
+class ErrorBoundary extends Component<
+  { children: ReactNode },
+  { hasError: boolean; error: Error | null }
+> {
+  constructor(props: { children: ReactNode }) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error('Error Boundary caught:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20, backgroundColor: '#fff' }}>
+          <Text style={{ fontSize: 20, fontWeight: 'bold', color: '#d32f2f', marginBottom: 10 }}>
+            ❌ Erro na aplicação
+          </Text>
+          <Text style={{ fontSize: 14, color: '#666', textAlign: 'center' }}>
+            {this.state.error?.message || 'Erro desconhecido'}
+          </Text>
+          <Text style={{ fontSize: 12, color: '#999', marginTop: 10 }}>
+            Verifique o console para mais detalhes
+          </Text>
+        </View>
+      );
+    }
+
+    return this.props.children;
+  }
+}
 
 // Configurar comportamento padrão de notificações
 Notifications.setNotificationHandler({
@@ -75,21 +114,24 @@ export default function App() {
   }, []);
 
   return (
-    <Provider store={store}>
-      <PersistGate 
-        loading={
-          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <ActivityIndicator size="large" color="#1E88E5" />
-          </View>
-        } 
-        persistor={persistor}
-      >
-        <ThemeProvider>
-          <SafeAreaProvider>
-            <Navigation />
-          </SafeAreaProvider>
-        </ThemeProvider>
-      </PersistGate>
-    </Provider>
+    <ErrorBoundary>
+      <Provider store={store}>
+        <PersistGate 
+          loading={
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#fff' }}>
+              <ActivityIndicator size="large" color="#1E88E5" />
+              <Text style={{ marginTop: 10, color: '#666' }}>Carregando...</Text>
+            </View>
+          } 
+          persistor={persistor}
+        >
+          <ThemeProvider>
+            <SafeAreaProvider>
+              <Navigation />
+            </SafeAreaProvider>
+          </ThemeProvider>
+        </PersistGate>
+      </Provider>
+    </ErrorBoundary>
   );
 }
