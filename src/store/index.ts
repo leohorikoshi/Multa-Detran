@@ -1,20 +1,22 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { persistStore, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from 'redux-persist';
-import { persistedReducer } from './persistConfig';
+import { combineReducers } from '@reduxjs/toolkit';
+import authReducer from './slices/authSlice';
+
+// Versão SEM persist para debug
+const rootReducer = combineReducers({
+  auth: authReducer,
+});
 
 export const store = configureStore({
-  reducer: persistedReducer,
+  reducer: rootReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
-        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER, 'auth/login/fulfilled', 'auth/register/fulfilled'],
         ignoredActionPaths: ['payload.createdAt', 'payload.updatedAt'],
         ignoredPaths: ['auth.user.createdAt'],
       },
     }),
 });
-
-export const persistor = persistStore(store);
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

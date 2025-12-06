@@ -3,7 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 import { useAppSelector } from '../hooks/useRedux';
-import { useInitializeAuth } from '../hooks/useInitializeAuth';
+// import { useInitializeAuth } from '../hooks/useInitializeAuth'; // DESABILITADO - causa erro na web
 
 // Telas não autenticadas
 import { WelcomeScreen } from '../screens/WelcomeScreen';
@@ -19,19 +19,15 @@ import SettingsScreen from '../screens/SettingsScreen';
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export const Navigation = () => {
-  // Inicializar auth do storage
-  useInitializeAuth();
+  // Temporariamente desabilitado - causa erro na web
+  // useInitializeAuth();
   
   const { token, isLoading, user } = useAppSelector((state) => state.auth);
   
   useEffect(() => {
     console.log('🔄 Navigation atualizada!');
     console.log('🔍 Token:', token ? 'Presente' : 'Ausente');
-    console.log('🔍 Token valor:', token);
-    console.log('🔍 User:', user?.email || 'Nenhum');
-    console.log('🔍 User completo:', JSON.stringify(user, null, 2));
-    console.log('🔍 isLoading:', isLoading);
-    console.log('🚪 Mostrando telas:', token ? 'AUTENTICADAS (Home, etc)' : 'NÃO AUTENTICADAS (Login, etc)');
+    console.log('🚪 Mostrando telas:', token ? 'AUTENTICADAS' : 'NÃO AUTENTICADAS');
   }, [token, user, isLoading]);
 
   return (

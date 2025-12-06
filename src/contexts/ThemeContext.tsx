@@ -61,23 +61,20 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 
   const loadTheme = async () => {
     try {
-      const savedTheme = await AsyncStorage.getItem(THEME_STORAGE_KEY);
-      if (savedTheme && ['light', 'dark', 'auto'].includes(savedTheme)) {
-        setThemeModeState(savedTheme as ThemeMode);
-      } else {
-        // Default: auto (seguir sistema)
-        setThemeModeState('auto');
-      }
+      // Temporariamente sem persistência - sempre usa 'light'
+      setThemeModeState('light');
+      console.log('🎨 Theme: Usando light mode (sem persistência)');
     } catch (error) {
       console.error('Erro ao carregar tema:', error);
-      setThemeModeState('auto');
+      setThemeModeState('light');
     }
   };
 
   const setThemeMode = async (mode: ThemeMode) => {
     try {
-      await AsyncStorage.setItem(THEME_STORAGE_KEY, mode);
+      // Temporariamente sem salvar no storage
       setThemeModeState(mode);
+      console.log('🎨 Theme mudado para:', mode);
     } catch (error) {
       console.error('Erro ao salvar tema:', error);
     }
