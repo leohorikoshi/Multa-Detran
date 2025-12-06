@@ -3,9 +3,20 @@
  * Suporta WhatsApp, Facebook, Instagram, Twitter, Email
  */
 
-import Share from 'react-native-share';
-import * as Sharing from 'expo-sharing';
 import { Platform } from 'react-native';
+
+// Importações condicionais para evitar erros na web
+let Share: any = null;
+let Sharing: any = null;
+
+if (Platform.OS !== 'web') {
+  try {
+    Share = require('react-native-share').default;
+    Sharing = require('expo-sharing');
+  } catch (e) {
+    console.warn('Share services not available:', e);
+  }
+}
 
 export interface ShareViolationData {
   id: string;
@@ -109,6 +120,11 @@ Baixe: https://detrandenuncia.com.br
  * Compartilha uma denúncia via WhatsApp
  */
 export const shareViaWhatsApp = async (data: ShareViolationData): Promise<boolean> => {
+  if (Platform.OS === 'web' || !Share) {
+    console.warn('WhatsApp sharing not available on web');
+    return false;
+  }
+  
   try {
     const message = shareTemplates.whatsapp(data);
     
@@ -130,6 +146,11 @@ export const shareViaWhatsApp = async (data: ShareViolationData): Promise<boolea
  * Compartilha uma denúncia via Facebook
  */
 export const shareViaFacebook = async (data: ShareViolationData): Promise<boolean> => {
+  if (Platform.OS === 'web' || !Share) {
+    console.warn('Facebook sharing not available on web');
+    return false;
+  }
+  
   try {
     const message = shareTemplates.facebook(data);
     const url = `https://detrandenuncia.com.br/violation/${data.id}`;
@@ -153,6 +174,11 @@ export const shareViaFacebook = async (data: ShareViolationData): Promise<boolea
  * Compartilha uma denúncia via Twitter
  */
 export const shareViaTwitter = async (data: ShareViolationData): Promise<boolean> => {
+  if (Platform.OS === 'web' || !Share) {
+    console.warn('Twitter sharing not available on web');
+    return false;
+  }
+  
   try {
     const message = shareTemplates.twitter(data);
     const url = `https://detrandenuncia.com.br/violation/${data.id}`;
@@ -176,6 +202,11 @@ export const shareViaTwitter = async (data: ShareViolationData): Promise<boolean
  * Compartilha uma denúncia via Instagram (Stories)
  */
 export const shareViaInstagram = async (data: ShareViolationData): Promise<boolean> => {
+  if (Platform.OS === 'web' || !Share) {
+    console.warn('Instagram sharing not available on web');
+    return false;
+  }
+  
   try {
     if (!data.imageUrl) {
       throw new Error('Imagem necessária para compartilhar no Instagram');
@@ -203,6 +234,11 @@ export const shareViaInstagram = async (data: ShareViolationData): Promise<boole
  * Compartilha uma denúncia via Email
  */
 export const shareViaEmail = async (data: ShareViolationData): Promise<boolean> => {
+  if (Platform.OS === 'web' || !Share) {
+    console.warn('Email sharing not available on web');
+    return false;
+  }
+  
   try {
     const { subject, body } = shareTemplates.email(data);
     
@@ -226,6 +262,11 @@ export const shareViaEmail = async (data: ShareViolationData): Promise<boolean> 
  * Abre o sheet nativo de compartilhamento (iOS/Android)
  */
 export const shareViaSystem = async (data: ShareViolationData): Promise<boolean> => {
+  if (Platform.OS === 'web' || !Share) {
+    console.warn('System sharing not available on web');
+    return false;
+  }
+  
   try {
     const message = shareTemplates.generic(data);
     const url = `https://detrandenuncia.com.br/violation/${data.id}`;

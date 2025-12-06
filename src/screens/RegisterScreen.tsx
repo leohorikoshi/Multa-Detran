@@ -94,19 +94,25 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) =>
       const result = await dispatch(register(userData)).unwrap();
       console.log('✅ Registro bem-sucedido:', result);
       
-      Alert.alert(
-        'Sucesso!',
-        'Sua conta foi criada com sucesso!',
-        [
-          { 
-            text: 'OK',
-            onPress: () => {
-              console.log('📍 Navegando para Home após registro...');
-              // A navegação será automática pelo Redux/Navigation
+      // Alert na web é problemático, vamos usar window.alert ou navegar direto
+      if (Platform.OS === 'web') {
+        console.log('🌐 Web: Navegando automaticamente para Home...');
+        navigation.replace('Home');
+      } else {
+        Alert.alert(
+          'Sucesso!',
+          'Sua conta foi criada com sucesso!',
+          [
+            { 
+              text: 'OK',
+              onPress: () => {
+                console.log('📍 Navegando para Home após registro...');
+                navigation.replace('Home');
+              }
             }
-          }
-        ]
-      );
+          ]
+        );
+      }
     } catch (error: any) {
       console.error('❌ Erro capturado no RegisterScreen:', error);
       console.error('Tipo do erro:', typeof error);
