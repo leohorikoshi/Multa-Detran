@@ -1,0 +1,23 @@
+{
+  "short_name": "DetranDenuncia",
+  "name": "DetranDenuncia - Denúncias de Trânsito",
+  "description": "App colaborativo para denúncias de infrações de trânsito",
+  "icons": [
+    {
+      "src": "/assets/icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#1E88E5",
+  "background_color": "#FFFFFF",
+  "orientation": "portrait"
+}
