@@ -39,10 +39,12 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/detran-de
 import authRoutes from './routes/auth.routes';
 import violationRoutes from './routes/violation.routes';
 import notificationRoutes from './routes/notification.routes';
+import gamificationRoutes from './routes/gamification.routes';
 
 app.use('/api/auth', authRoutes);
 app.use('/api/violations', violationRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/gamification', gamificationRoutes);
 
 // Middleware de erro global
 app.use(errorHandler);
