@@ -16,23 +16,8 @@ import { ReportViolationScreen } from '../screens/ReportViolationScreen';
 import { MyReportsScreen } from '../screens/MyReportsScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import AdminDashboard from '../screens/AdminDashboard';
+import HeatmapScreen from '../screens/HeatmapScreen'; // React Native vai escolher .web.tsx na web automaticamente
 import { Platform, View, Text, StyleSheet } from 'react-native';
-
-// HeatmapScreen usa react-native-maps que não funciona na web
-let HeatmapScreen: any;
-if (Platform.OS !== 'web') {
-  HeatmapScreen = require('../screens/HeatmapScreen').default;
-} else {
-  // Componente placeholder para web
-  HeatmapScreen = () => (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}>
-      <Text style={{ fontSize: 48, marginBottom: 16 }}>🗺️</Text>
-      <Text style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 12, textAlign: 'center' }}>Mapa de Calor</Text>
-      <Text style={{ fontSize: 14, color: '#666', textAlign: 'center' }}>Esta funcionalidade usa mapas nativos e está disponível apenas no aplicativo mobile.</Text>
-      <Text style={{ fontSize: 14, color: '#666', marginTop: 12, textAlign: 'center' }}>Instale o app no seu celular para visualizar o mapa de calor das regiões com mais denúncias.</Text>
-    </View>
-  );
-}
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
