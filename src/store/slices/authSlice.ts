@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { AuthResponse, User } from '../types/api';
-import api from '../utils/api';
-import { AuthStorage } from '../utils/auth-storage';
+import { AuthResponse, User } from '../../types/api';
+import api from '../../utils/api';
+import { AuthStorage } from '../../utils/auth-storage';
 
 interface AuthState {
   user: User | null;
@@ -21,15 +21,19 @@ export const login = createAsyncThunk(
   'auth/login',
   async (credentials: { email: string; password: string }) => {
     try {
+      console.log('🔐 Tentando fazer login com:', credentials.email);
       const response = await api.post<AuthResponse>(
         '/auth/login',
         credentials
       );
-      // Salvar token e user no storage
-      await AuthStorage.setToken(response.data.token);
+      console.log('✅ Login bem-sucedido:', response.data);
+      // Salvar token e user no storage (usando o mesmo token para ambos por enquanto)
+      await AuthStorage.setTokens(response.data.token, response.data.token);
       await AuthStorage.setUser(response.data.user);
       return response.data;
     } catch (error: any) {
+      console.error('❌ Erro no login:', error);
+      console.error('Response:', error.response?.data);
       throw error.response?.data?.message || 'Erro ao fazer login';
     }
   }
@@ -39,16 +43,22 @@ export const register = createAsyncThunk(
   'auth/register',
   async (userData: { name: string; email: string; cpf: string; password: string }) => {
     try {
+      console.log('📝 Tentando registrar usuário:', userData.email);
       const response = await api.post<AuthResponse>(
         '/auth/register',
         userData
       );
-      // Salvar token e user no storage
-      await AuthStorage.setToken(response.data.token);
+      console.log('✅ Registro bem-sucedido:', response.data);
+      // Salvar token e user no storage (usando o mesmo token para ambos por enquanto)
+      await AuthStorage.setTokens(response.data.token, response.data.token);
       await AuthStorage.setUser(response.data.user);
       return response.data;
     } catch (error: any) {
-      throw error.response?.data?.message || 'Erro ao registrar usuário';
+      console.error('❌ Erro no registro:', error);
+      console.error('Response completa:', error.response);
+      const errorMessage = error.response?.data?.message || error.message || 'Erro ao registrar usuário';
+      console.error('Mensagem de erro:', errorMessage);
+      throw errorMessage;
     }
   }
 );
@@ -66,6 +76,11 @@ const authSlice = createSlice({
     },
     clearError: (state) => {
       state.error = null;
+    },
+    initializeFromStorage: (state, action) => {
+      state.token = action.payload.token;
+      state.user = action.payload.user;
+      state.isLoading = false;
     },
   },
   extraReducers: (builder) => {

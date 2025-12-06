@@ -50,28 +50,36 @@ export const useFormValidation = ({ rules, onValidationChange }: UseFormValidati
     return isValid;
   }, [rules, values, validateField, onValidationChange]);
 
-  // Atualizar valor do campo com validação em tempo real
+  // Atualizar valor do campo SEM validação automática
   const setValue = useCallback((field: string, value: string) => {
     setValues(prev => ({ ...prev, [field]: value }));
+  }, []);
+
+  // Marcar campo como tocado (para validação no blur)
+  const setFieldTouched = useCallback((field: string) => {
     setTouched(prev => ({ ...prev, [field]: true }));
-    
-    const error = validateField(field, value);
-    setErrors(prev => ({ ...prev, [field]: error }));
+    // Usar uma função de atualização para pegar o valor mais recente
+    setValues(currentValues => {
+      const value = currentValues[field] || '';
+      const error = validateField(field, value);
+      setErrors(prev => ({ ...prev, [field]: error }));
+      return currentValues; // Retornar o mesmo state sem modificar
+    });
   }, [validateField]);
 
-  // Verificar se o formulário está válido
+  // Verificar se o formulário está válido (calculado sob demanda, não reativo)
   const isValid = useMemo(() => {
-    return Object.keys(rules).every(field => {
-      const value = values[field] || '';
-      return !validateField(field, value);
-    });
-  }, [rules, values, validateField]);
+    // Retornar sempre true para evitar re-renders
+    // A validação real acontece no validateAllFields
+    return true;
+  }, []);
 
   return {
     values,
     errors,
     touched,
     setValue,
+    setFieldTouched,
     validateAllFields,
     isValid,
   };

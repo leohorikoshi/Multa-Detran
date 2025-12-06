@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
@@ -21,7 +21,14 @@ export const Navigation = () => {
   // Inicializar auth do storage
   useInitializeAuth();
   
-  const { token, isLoading } = useAppSelector((state) => state.auth);
+  const { token, isLoading, user } = useAppSelector((state) => state.auth);
+  
+  useEffect(() => {
+    console.log('🔄 Navigation atualizada!');
+    console.log('🔍 Token:', token ? 'Presente' : 'Ausente');
+    console.log('🔍 User:', user?.email || 'Nenhum');
+    console.log('🔍 isLoading:', isLoading);
+  }, [token, user, isLoading]);
 
   return (
     <NavigationContainer>

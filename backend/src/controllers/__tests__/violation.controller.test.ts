@@ -5,7 +5,6 @@ import {
   updateViolationStatus
 } from '../violation.controller';
 import { Violation } from '../../models/violation.model';
-import { IViolationDocument } from '../../types/models.types';
 
 jest.mock('../../models/violation.model');
 

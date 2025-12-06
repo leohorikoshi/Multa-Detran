@@ -1,9 +1,25 @@
 // Configuração da API
-// Para desenvolvimento local, use: http://localhost:3000/api
-// Para produção, use a URL do servidor
-export const API_BASE_URL = __DEV__ 
-  ? 'http://localhost:3000/api'
-  : 'https://api.detrandenuncia.gov.br/api';
+// Para desenvolvimento local:
+// - Web: use localhost
+// - Mobile: use o IP da sua máquina na rede local
+import { Platform } from 'react-native';
+
+const getApiUrl = () => {
+  if (!__DEV__) {
+    return 'https://api.detrandenuncia.gov.br/api';
+  }
+  
+  // Em desenvolvimento
+  if (Platform.OS === 'web') {
+    return 'http://localhost:3000/api';
+  }
+  
+  // Mobile usa o IP da rede local
+  // IMPORTANTE: Substitua pelo seu IP real
+  return 'http://192.168.15.87:3000/api';
+};
+
+export const API_BASE_URL = getApiUrl();
 
 export const VIOLATION_TYPES = [
   'Estacionamento irregular',

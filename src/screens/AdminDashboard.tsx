@@ -9,17 +9,20 @@ import {
   Alert,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { RootStackScreenProps } from '../types/navigation';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../types/navigation';
 import { Violation } from '../types/models';
 import api from '../utils/api';
 import { formatDate } from '../utils/format';
 import { ViolationStatus } from '../components/ui';
 
+type AdminDashboardNavigationProp = NativeStackNavigationProp<RootStackParamList, 'AdminDashboard'>;
+
 export const AdminDashboard = () => {
   const [violations, setViolations] = useState<Violation[]>([]);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const navigation = useNavigation();
+  const navigation = useNavigation<AdminDashboardNavigationProp>();
 
   const loadViolations = async () => {
     try {

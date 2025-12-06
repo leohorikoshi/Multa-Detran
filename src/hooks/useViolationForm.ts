@@ -1,6 +1,4 @@
 import { useState, useCallback } from 'react';
-import * as ImagePicker from 'expo-image-picker';
-import * as Location from 'expo-location';
 import { Alert } from 'react-native';
 
 interface ViolationForm {
@@ -55,35 +53,12 @@ export const useViolationForm = (): UseViolationFormReturn => {
     try {
       setLoading(prev => ({ ...prev, camera: true }));
       
-      const { status } = await ImagePicker.requestCameraPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert(
-          'Permissão necessária',
-          'Precisamos da sua permissão para acessar a câmera.',
-          [
-            { text: 'Cancelar', style: 'cancel' },
-            { 
-              text: 'Abrir Configurações',
-              onPress: () => ImagePicker.requestCameraPermissionsAsync()
-            }
-          ]
-        );
-        return;
-      }
-
-      const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        quality: 0.8,
-        allowsEditing: true,
-        aspect: [4, 3],
-      });
-
-      if (!result.canceled && result.assets[0].uri) {
-        setForm(prev => ({
-          ...prev,
-          images: [...prev.images, result.assets[0].uri],
-        }));
-      }
+      // Funcionalidade desabilitada - requer módulos nativos
+      Alert.alert(
+        'Funcionalidade Indisponível',
+        'A câmera está disponível apenas no aplicativo nativo. Para testes web, use a galeria de imagens.',
+        [{ text: 'OK', style: 'cancel' }]
+      );
     } catch (error) {
       Alert.alert('Erro', 'Não foi possível capturar a foto. Tente novamente.');
     } finally {
@@ -95,35 +70,12 @@ export const useViolationForm = (): UseViolationFormReturn => {
     try {
       setLoading(prev => ({ ...prev, camera: true }));
       
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert(
-          'Permissão necessária',
-          'Precisamos da sua permissão para acessar a galeria.',
-          [
-            { text: 'Cancelar', style: 'cancel' },
-            { 
-              text: 'Abrir Configurações',
-              onPress: () => ImagePicker.requestMediaLibraryPermissionsAsync()
-            }
-          ]
-        );
-        return;
-      }
-
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        quality: 0.8,
-        allowsEditing: true,
-        aspect: [4, 3],
-      });
-
-      if (!result.canceled && result.assets[0].uri) {
-        setForm(prev => ({
-          ...prev,
-          images: [...prev.images, result.assets[0].uri],
-        }));
-      }
+      // Funcionalidade desabilitada - requer módulos nativos
+      Alert.alert(
+        'Funcionalidade Indisponível',
+        'A seleção de imagens está disponível apenas no aplicativo nativo.',
+        [{ text: 'OK', style: 'cancel' }]
+      );
     } catch (error) {
       Alert.alert('Erro', 'Não foi possível selecionar a foto. Tente novamente.');
     } finally {
@@ -135,33 +87,12 @@ export const useViolationForm = (): UseViolationFormReturn => {
     try {
       setLoading(prev => ({ ...prev, location: true }));
       
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert(
-          'Permissão necessária',
-          'Precisamos da sua permissão para acessar a localização.',
-          [
-            { text: 'Cancelar', style: 'cancel' },
-            { 
-              text: 'Abrir Configurações',
-              onPress: () => Location.requestForegroundPermissionsAsync()
-            }
-          ]
-        );
-        return;
-      }
-
-      const location = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.High,
-      });
-
-      setForm(prev => ({
-        ...prev,
-        location: {
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
-        },
-      }));
+      // Funcionalidade desabilitada - requer módulos nativos
+      Alert.alert(
+        'Funcionalidade Indisponível',
+        'A geolocalização está disponível apenas no aplicativo nativo.',
+        [{ text: 'OK', style: 'cancel' }]
+      );
     } catch (error) {
       Alert.alert('Erro', 'Não foi possível obter sua localização. Tente novamente.');
     } finally {

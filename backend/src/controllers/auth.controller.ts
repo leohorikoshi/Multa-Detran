@@ -5,6 +5,16 @@ import { LoginCredentials, RegisterData, AuthResponse } from '../types/auth.type
 import { AsyncController, createResponse } from '../types/controller.types';
 import { IUserDocument } from '../types/models.types';
 
+interface RequestWithUser extends Request {
+  user?: {
+    id: string;
+    _id: string;
+    role: string;
+    name: string;
+    email: string;
+  };
+}
+
 const generateToken = (id: string, role: string): string => {
   const payload = { id, role };
   const secret = process.env.JWT_SECRET || 'sua_chave_secreta';
@@ -27,12 +37,15 @@ export const register: AsyncController = async (req: Request, res: Response) => 
   try {
     const data: RegisterData = req.body;
     
+    console.log('📥 Dados recebidos no backend:', data);
+    
     // Verificar se já existe um usuário
     const existingUser = await User.findOne({
       $or: [{ email: data.email }, { cpf: data.cpf }]
     });
 
     if (existingUser) {
+      console.log('⚠️ Usuário já existe:', existingUser.email);
       return res.status(400).json(
         createResponse(false, null, 'Email ou CPF já cadastrado')
       );
@@ -54,6 +67,7 @@ export const register: AsyncController = async (req: Request, res: Response) => 
       createResponse(true, responseData)
     );
   } catch (error: any) {
+    console.error('❌ Erro no registro:', error.message, error.stack);
     return res.status(400).json(
       createResponse(false, null, error.message || 'Erro ao criar conta')
     );
@@ -62,22 +76,37 @@ export const register: AsyncController = async (req: Request, res: Response) => 
 
 export const login: AsyncController = async (req: Request, res: Response) => {
   try {
+    console.log('🔐 Login - Dados recebidos:', req.body);
     const { email, password } = req.body as LoginCredentials;
 
     if (!email || !password) {
+      console.log('⚠️ Email ou senha faltando');
       return res.status(401).json(
         createResponse(false, null, 'Por favor, forneça email e senha')
       );
     }
 
+    console.log('🔍 Buscando usuário:', email);
     const user = await User.findOne({ email }).select('+password') as IUserDocument;
     
-    if (!user || !(await user.comparePassword(password))) {
+    if (!user) {
+      console.log('❌ Usuário não encontrado');
       return res.status(401).json(
         createResponse(false, null, 'Email ou senha incorretos')
       );
     }
 
+    console.log('🔑 Verificando senha...');
+    const isPasswordValid = await user.comparePassword(password);
+    
+    if (!isPasswordValid) {
+      console.log('❌ Senha incorreta');
+      return res.status(401).json(
+        createResponse(false, null, 'Email ou senha incorretos')
+      );
+    }
+
+    console.log('✅ Login bem-sucedido');
     const token = generateToken(user._id.toString(), user.role);
     const responseData = createUserResponse(user, token);
 
@@ -85,13 +114,15 @@ export const login: AsyncController = async (req: Request, res: Response) => {
       createResponse(true, responseData)
     );
   } catch (error: any) {
+    console.error('❌ Erro no login:', error.message);
+    console.error('Stack:', error.stack);
     return res.status(400).json(
       createResponse(false, null, error.message || 'Erro ao fazer login')
     );
   }
 };
 
-export const getProfile: AsyncController = async (req: Request, res: Response) => {
+export const getProfile: AsyncController = async (req: RequestWithUser, res: Response) => {
   try {
     if (!req.user?.id) {
       return res.status(401).json(

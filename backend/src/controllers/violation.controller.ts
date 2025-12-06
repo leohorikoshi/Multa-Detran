@@ -56,7 +56,7 @@ export const createViolation = async (req: RequestWithUser, res: Response): Prom
       data: { violation },
     });
   } catch (error: any) {
-    res.status(400).json({
+    return res.status(400).json({
       status: 'error',
       message: error.message,
     });
@@ -114,12 +114,12 @@ export const getViolationById = async (req: RequestWithUser, res: Response): Pro
       });
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       status: 'success',
       data: { violation },
     });
   } catch (error: any) {
-    res.status(400).json({
+    return res.status(400).json({
       status: 'error',
       message: error.message,
     });
@@ -218,7 +218,7 @@ export const getAllViolations = async (req: RequestWithUser, res: Response): Pro
       },
     });
   } catch (error: any) {
-    res.status(400).json({
+    return res.status(400).json({
       status: 'error',
       message: error.message,
     });

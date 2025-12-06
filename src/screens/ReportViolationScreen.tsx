@@ -12,8 +12,8 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
-import * as Location from 'expo-location';
+// import * as ImagePicker from 'expo-image-picker';
+// import * as Location from 'expo-location';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 import { VIOLATION_TYPES } from '../constants';
@@ -41,49 +41,13 @@ export const ReportViolationScreen: React.FC<ReportViolationScreenProps> = ({
   const [error, setError] = useState('');
 
   const handleTakePhoto = async () => {
-    try {
-      const { status } = await ImagePicker.requestCameraPermissionsAsync();
-      if (status !== 'granted') {
-        setError('Permissão para câmera necessária');
-        return;
-      }
-
-      const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        quality: 0.8,
-        allowsEditing: true,
-      });
-
-      if (!result.canceled && result.assets[0].uri) {
-        setForm(prev => ({
-          ...prev,
-          images: [...prev.images, result.assets[0].uri],
-        }));
-      }
-    } catch (error) {
-      setError('Erro ao capturar foto');
-    }
+    // Temporariamente desabilitado - requer módulo nativo
+    setError('Funcionalidade de câmera disponível apenas no app nativo');
   };
 
   const getCurrentLocation = async () => {
-    try {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setError('Permissão para localização necessária');
-        return;
-      }
-
-      const location = await Location.getCurrentPositionAsync({});
-      setForm(prev => ({
-        ...prev,
-        location: {
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
-        },
-      }));
-    } catch (error) {
-      setError('Erro ao obter localização');
-    }
+    // Temporariamente desabilitado - requer módulo nativo
+    setError('Funcionalidade de localização disponível apenas no app nativo');
   };
 
   const handleSubmit = async () => {

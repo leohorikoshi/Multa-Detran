@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   View,
   Text,
@@ -6,15 +6,15 @@ import {
   SafeAreaView,
   Alert,
   useWindowDimensions,
-  ScrollView,
   KeyboardAvoidingView,
   Platform,
+  TouchableOpacity,
 } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 import { useAppDispatch, useAppSelector } from '../hooks/useRedux';
 import { register } from '../store/slices/authSlice';
-import { Input, Button } from '../components/ui/FormComponents';
+import { Input, Button, PasswordInput } from '../components/ui/FormComponents';
 import { FormContainer, FormGroup } from '../components/ui/FormContainer';
 import { LoadingOverlay } from '../components/ui';
 import { useFormValidation, commonValidationRules } from '../hooks/useFormValidation';
@@ -27,6 +27,9 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) =>
   const { width, height } = useWindowDimensions();
   const dispatch = useAppDispatch();
   const { isLoading, error } = useAppSelector((state) => state.auth);
+  
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   
   const isSmallScreen = width < 380;
   const isLandscape = width > height;
@@ -57,12 +60,19 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) =>
     ],
   };
 
-  const { values, errors, touched, setValue, validateAllFields, isValid } = useFormValidation({
+  const { values, errors, touched, setValue, setFieldTouched, validateAllFields, isValid } = useFormValidation({
     rules: validationRules,
   });
 
   const handleRegister = useCallback(async () => {
-    if (!validateAllFields()) {
+    console.log('🔵 handleRegister chamado');
+    console.log('📝 Values:', values);
+    
+    const validationResult = validateAllFields();
+    console.log('✅ Validação:', validationResult);
+    
+    if (!validationResult) {
+      console.log('❌ Validação falhou, erros:', errors);
       Alert.alert(
         'Campos Inválidos',
         'Por favor, verifique os campos destacados em vermelho e tente novamente.'
@@ -70,27 +80,56 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) =>
       return;
     }
 
+    const userData = {
+      name: values.name,
+      email: values.email.toLowerCase(),
+      cpf: values.cpf.replace(/[^\d]/g, ''),
+      password: values.password,
+    };
+
+    console.log('📤 Enviando dados:', userData);
+
     try {
-      await dispatch(register({
-        name: values.name,
-        email: values.email,
-        cpf: values.cpf.replace(/[^\d]/g, ''),
-        password: values.password,
-      })).unwrap();
+      console.log('📤 Enviando registro...');
+      const result = await dispatch(register(userData)).unwrap();
+      console.log('✅ Registro bem-sucedido:', result);
+      
       Alert.alert(
         'Sucesso!',
-        'Sua conta foi criada com sucesso. Você será redirecionado para a tela inicial.',
-        [{ text: 'OK' }]
+        'Sua conta foi criada com sucesso!',
+        [
+          { 
+            text: 'OK',
+            onPress: () => {
+              console.log('📍 Navegando para Home após registro...');
+              // A navegação será automática pelo Redux/Navigation
+            }
+          }
+        ]
       );
-      // Navegação será automática pelo NavigationContainer
     } catch (error: any) {
-      const errorMessage = error.message === 'Email already exists'
-        ? 'Este email já está cadastrado. Por favor, use outro email ou faça login.'
-        : error.message || 'Ocorreu um erro ao criar sua conta. Por favor, tente novamente.';
+      console.error('❌ Erro capturado no RegisterScreen:', error);
+      console.error('Tipo do erro:', typeof error);
+      
+      let errorMessage = 'Ocorreu um erro ao criar sua conta. Por favor, tente novamente.';
+      
+      // Se error é uma string (vem do throw no Redux)
+      if (typeof error === 'string') {
+        errorMessage = error;
+      }
+      // Se error tem uma propriedade message
+      else if (error?.message) {
+        errorMessage = error.message;
+      }
+      
+      // Personalizar mensagens comuns
+      if (errorMessage.includes('já cadastrado') || errorMessage.includes('already exists')) {
+        errorMessage = 'Este email ou CPF já está cadastrado. Tente fazer login ou use outros dados.';
+      }
       
       Alert.alert('Erro no Cadastro', errorMessage);
     }
-  }, [dispatch, values, validateAllFields]);
+  }, [dispatch, values, validateAllFields, errors]);
 
   const formatCPF = (value: string) => {
     const numbers = value.replace(/[^\d]/g, '');
@@ -114,13 +153,10 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) =>
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={[styles.content, isLandscape && styles.landscapeContent]}
       >
-        <ScrollView
-          contentContainerStyle={[
-            styles.scrollContent,
-            isLandscape && styles.landscapeScrollContent
-          ]}
-          showsVerticalScrollIndicator={false}
-        >
+        <View style={[
+          styles.scrollContent,
+          isLandscape && styles.landscapeScrollContent
+        ]}>
           <View style={[styles.header, isLandscape && styles.landscapeHeader]}>
             <Text style={[styles.title, isSmallScreen && styles.smallScreenTitle]}>
               Criar Conta
@@ -133,76 +169,93 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) =>
           <FormContainer>
             <FormGroup>
               <Input
-            label="Nome Completo"
-            placeholder="Digite seu nome completo"
-            value={values.name || ''}
-            onChangeText={(value) => setValue('name', value)}
-            error={touched.name ? errors.name : ''}
-            autoCapitalize="words"
-            returnKeyType="next"
-            editable={!isLoading}
-          />
+                label="Nome Completo"
+                placeholder="Digite seu nome completo"
+                value={values.name || ''}
+                onChangeText={(value) => setValue('name', value)}
+                onBlur={() => setFieldTouched('name')}
+                error={touched.name ? errors.name : ''}
+                autoCapitalize="words"
+                returnKeyType="next"
+                editable={!isLoading}
+              />
 
-          <Input
-            label="E-mail"
-            placeholder="Digite seu e-mail"
-            value={values.email || ''}
-            onChangeText={(value) => setValue('email', value.toLowerCase())}
-            error={touched.email ? errors.email : ''}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            autoCorrect={false}
-            returnKeyType="next"
-          />
+              <Input
+                label="E-mail"
+                placeholder="Digite seu e-mail"
+                value={values.email || ''}
+                onChangeText={(value) => setValue('email', value)}
+                onBlur={() => setFieldTouched('email')}
+                error={touched.email ? errors.email : ''}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
+                returnKeyType="next"
+                editable={!isLoading}
+              />
 
-          <Input
-            label="CPF"
-            placeholder="Digite seu CPF"
-            value={values.cpf || ''}
-            onChangeText={(value) => setValue('cpf', formatCPF(value))}
-            error={touched.cpf ? errors.cpf : ''}
-            keyboardType="numeric"
-            maxLength={14}
-            returnKeyType="next"
-          />
+              <Input
+                label="CPF"
+                placeholder="Digite apenas números (11 dígitos)"
+                value={values.cpf || ''}
+                onChangeText={(value) => {
+                  // Remove tudo que não é número
+                  const numbers = value.replace(/[^\d]/g, '');
+                  // Limita a 11 dígitos
+                  if (numbers.length <= 11) {
+                    setValue('cpf', numbers);
+                  }
+                }}
+                onBlur={() => setFieldTouched('cpf')}
+                error={touched.cpf ? errors.cpf : ''}
+                keyboardType="numeric"
+                returnKeyType="next"
+                editable={!isLoading}
+              />
 
-          <Input
-            label="Senha"
-            placeholder="Digite sua senha"
-            value={values.password || ''}
-            onChangeText={(value) => setValue('password', value)}
-            error={touched.password ? errors.password : ''}
-            secureTextEntry
-            returnKeyType="next"
-          />
+              <PasswordInput
+                label="Senha"
+                placeholder="Digite sua senha"
+                value={values.password || ''}
+                onChangeText={(value) => setValue('password', value)}
+                onBlur={() => setFieldTouched('password')}
+                error={touched.password ? errors.password : ''}
+                showPassword={showPassword}
+                onTogglePassword={() => setShowPassword(!showPassword)}
+                returnKeyType="next"
+                editable={!isLoading}
+              />
 
-          <Input
-            label="Confirmar Senha"
-            placeholder="Digite sua senha novamente"
-            value={values.confirmPassword || ''}
-            onChangeText={(value) => setValue('confirmPassword', value)}
-            error={touched.confirmPassword ? errors.confirmPassword : ''}
-            secureTextEntry
-            returnKeyType="done"
-          />
-        </FormGroup>
+              <PasswordInput
+                label="Confirmar Senha"
+                placeholder="Digite sua senha novamente"
+                value={values.confirmPassword || ''}
+                onChangeText={(value) => setValue('confirmPassword', value)}
+                onBlur={() => setFieldTouched('confirmPassword')}
+                error={touched.confirmPassword ? errors.confirmPassword : ''}
+                showPassword={showConfirmPassword}
+                onTogglePassword={() => setShowConfirmPassword(!showConfirmPassword)}
+                returnKeyType="done"
+                editable={!isLoading}
+              />
+            </FormGroup>
 
-        <FormGroup>
-          <Button
-            title="Criar conta"
-            onPress={handleRegister}
-            disabled={isLoading || !isValid}
-            loading={isLoading}
-          />
+            <FormGroup>
+              <Button
+                title="Criar conta"
+                onPress={handleRegister}
+                disabled={isLoading}
+                loading={isLoading}
+              />
 
-          <Button
-            title="Já tenho uma conta"
-            onPress={() => navigation.navigate('Login')}
-            variant="outline"
-          />
-        </FormGroup>
-      </FormContainer>
-        </ScrollView>
+              <Button
+                title="Já tenho uma conta"
+                onPress={() => navigation.navigate('Login')}
+                variant="outline"
+              />
+            </FormGroup>
+          </FormContainer>
+        </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

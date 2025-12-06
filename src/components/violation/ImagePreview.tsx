@@ -22,13 +22,8 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({ uri, onRemove, isFir
   return (
     <View style={[styles.container, isFirstImage && styles.firstImage]}>
       <CachedImage
-        source={{ uri }}
+        uri={uri}
         style={styles.image}
-        loadingComponent={
-          <View style={styles.loading}>
-            <ActivityIndicator color="#1a73e8" />
-          </View>
-        }
       />
       <TouchableOpacity style={styles.removeButton} onPress={onRemove}>
         <Ionicons name="close-circle" size={24} color="#ff4444" />

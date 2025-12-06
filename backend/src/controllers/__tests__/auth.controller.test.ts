@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import { register, login } from '../auth.controller';
 import { User } from '../../models/user.model';
-import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 jest.mock('../../models/user.model');
@@ -21,7 +20,6 @@ interface RequestWithUser extends Request {
 describe('Auth Controller', () => {
   let mockRequest: Partial<RequestWithUser>;
   let mockResponse: Partial<Response>;
-  let mockNext: jest.Mock;
 
   beforeEach(() => {
     mockRequest = {
@@ -31,7 +29,6 @@ describe('Auth Controller', () => {
       status: jest.fn().mockReturnThis(),
       json: jest.fn()
     };
-    mockNext = jest.fn();
   });
 
   describe('register', () => {
@@ -54,7 +51,7 @@ describe('Auth Controller', () => {
       (User.create as jest.Mock).mockResolvedValueOnce(mockUser);
       (jwt.sign as jest.Mock).mockReturnValueOnce('mockToken');
 
-      await register(mockRequest as Request, mockResponse as Response, mockNext);
+      await register(mockRequest as Request, mockResponse as Response);
 
       expect(User.findOne).toHaveBeenCalledWith({
         $or: [
@@ -83,7 +80,7 @@ describe('Auth Controller', () => {
       mockRequest.body = validRegisterData;
       (User.findOne as jest.Mock).mockResolvedValueOnce({ email: validRegisterData.email });
 
-      await register(mockRequest as Request, mockResponse as Response, mockNext);
+      await register(mockRequest as Request, mockResponse as Response);
 
       expect(mockResponse.status).toHaveBeenCalledWith(400);
       expect(mockResponse.json).toHaveBeenCalledWith(

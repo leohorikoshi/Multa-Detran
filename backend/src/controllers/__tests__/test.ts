@@ -2,7 +2,7 @@ import { describe, it, expect, jest } from '@jest/globals';
 
 describe('Test', () => {
   it('should call save', async () => {
-    const mockSave = jest.fn().mockResolvedValue(true);
+    const mockSave = jest.fn();
     const obj = {
       save: mockSave,
       value: 1

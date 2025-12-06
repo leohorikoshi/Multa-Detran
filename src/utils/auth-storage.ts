@@ -42,18 +42,6 @@ export const AuthStorage = {
     }
   },
 
-  async clear(): Promise<void> {
-    try {
-      await Promise.all([
-        AsyncStorage.removeItem(AUTH_TOKEN_KEY),
-        AsyncStorage.removeItem(REFRESH_TOKEN_KEY),
-        AsyncStorage.removeItem(USER_DATA_KEY),
-      ]);
-    } catch (error) {
-      console.error('Erro ao limpar dados de autenticação:', error);
-    }
-  },
-
   async getUser(): Promise<any | null> {
     try {
       const userData = await AsyncStorage.getItem(USER_DATA_KEY);
@@ -66,7 +54,11 @@ export const AuthStorage = {
 
   async clear(): Promise<void> {
     try {
-      await AsyncStorage.multiRemove([AUTH_TOKEN_KEY, USER_DATA_KEY]);
+      await Promise.all([
+        AsyncStorage.removeItem(AUTH_TOKEN_KEY),
+        AsyncStorage.removeItem(REFRESH_TOKEN_KEY),
+        AsyncStorage.removeItem(USER_DATA_KEY),
+      ]);
     } catch (error) {
       console.error('Erro ao limpar dados de autenticação:', error);
     }

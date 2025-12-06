@@ -13,7 +13,7 @@ import { Violation } from '../types/models';
 import api from '../utils/api';
 import { formatDate } from '../utils/format';
 import { ViolationStatus } from '../components/ui/ViolationStatus';
-import { FormButton, FormInput } from '../components/ui';
+import { Button, FormInput } from '../components/ui';
 
 export const ViolationDetailsScreen = () => {
   const [violation, setViolation] = useState<Violation | null>(null);
@@ -123,13 +123,13 @@ export const ViolationDetailsScreen = () => {
           />
 
           <View style={styles.buttonRow}>
-            <FormButton
+            <Button
               title={updating ? 'Aprovando...' : 'Aprovar'}
               onPress={() => handleUpdateStatus('approved')}
               disabled={updating}
               style={[styles.button, styles.approveButton]}
             />
-            <FormButton
+            <Button
               title={updating ? 'Rejeitando...' : 'Rejeitar'}
               onPress={() => handleUpdateStatus('rejected')}
               disabled={updating}
