@@ -22,15 +22,19 @@ export const login = createAsyncThunk(
   async (credentials: { email: string; password: string }) => {
     try {
       console.log('🔐 Tentando fazer login com:', credentials.email);
-      const response = await api.post<AuthResponse>(
+      const response = await api.post<{ status: string; data: AuthResponse }>(
         '/auth/login',
         credentials
       );
       console.log('✅ Login bem-sucedido:', response.data);
+      
+      // A resposta vem em response.data.data (estrutura ApiResponse)
+      const authData = response.data.data;
+      
       // Salvar token e user no storage (usando o mesmo token para ambos por enquanto)
-      await AuthStorage.setTokens(response.data.token, response.data.token);
-      await AuthStorage.setUser(response.data.user);
-      return response.data;
+      await AuthStorage.setTokens(authData.token, authData.token);
+      await AuthStorage.setUser(authData.user);
+      return authData;
     } catch (error: any) {
       console.error('❌ Erro no login:', error);
       console.error('Response:', error.response?.data);
@@ -44,15 +48,19 @@ export const register = createAsyncThunk(
   async (userData: { name: string; email: string; cpf: string; password: string }) => {
     try {
       console.log('📝 Tentando registrar usuário:', userData.email);
-      const response = await api.post<AuthResponse>(
+      const response = await api.post<{ status: string; data: AuthResponse }>(
         '/auth/register',
         userData
       );
       console.log('✅ Registro bem-sucedido:', response.data);
+      
+      // A resposta vem em response.data.data (estrutura ApiResponse)
+      const authData = response.data.data;
+      
       // Salvar token e user no storage (usando o mesmo token para ambos por enquanto)
-      await AuthStorage.setTokens(response.data.token, response.data.token);
-      await AuthStorage.setUser(response.data.user);
-      return response.data;
+      await AuthStorage.setTokens(authData.token, authData.token);
+      await AuthStorage.setUser(authData.user);
+      return authData;
     } catch (error: any) {
       console.error('❌ Erro no registro:', error);
       console.error('Response completa:', error.response);
@@ -87,15 +95,22 @@ const authSlice = createSlice({
     builder
       // Login
       .addCase(login.pending, (state) => {
+        console.log('⏳ Login pendente...');
         state.isLoading = true;
         state.error = null;
       })
       .addCase(login.fulfilled, (state, action) => {
+        console.log('✅ Login fulfilled! Atualizando Redux state...');
+        console.log('📦 Payload recebido:', action.payload);
         state.isLoading = false;
         state.user = action.payload.user;
         state.token = action.payload.token;
+        console.log('✅ Redux state atualizado!');
+        console.log('🔑 Token no state:', state.token ? 'Presente' : 'Ausente');
+        console.log('👤 User no state:', state.user?.email || 'Nenhum');
       })
       .addCase(login.rejected, (state, action) => {
+        console.log('❌ Login rejeitado:', action.error);
         state.isLoading = false;
         state.error = action.error.message || 'Erro desconhecido';
       })

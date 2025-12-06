@@ -23,6 +23,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [validation, setValidation] = useState({ email: '', password: '' });
+  const [errorMessage, setErrorMessage] = useState('');
 
   const dispatch = useAppDispatch();
   const { isLoading, error } = useAppSelector((state) => state.auth);
@@ -50,11 +51,10 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   };
 
   const handleLogin = async () => {
+    setErrorMessage(''); // Limpar erro anterior
+    
     if (!validate()) {
-      Alert.alert(
-        'Campos Inválidos',
-        'Por favor, verifique os campos destacados em vermelho e tente novamente.'
-      );
+      setErrorMessage('Por favor, verifique os campos destacados em vermelho e tente novamente.');
       return;
     }
 
@@ -65,22 +65,26 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
       console.log('✅ Token recebido:', result.token ? 'Sim' : 'Não');
       console.log('✅ User recebido:', result.user?.email);
       
-      // Forçar navegação imediata
-      console.log('📍 Navegando FORÇADAMENTE para Home...');
-      navigation.replace('Home');
+      // Não precisa navegar manualmente - o Redux vai re-renderizar o NavigationContainer
+      console.log('📍 Redux state atualizado, NavigationContainer vai re-renderizar automaticamente');
     } catch (error: any) {
       console.error('❌ Erro capturado no handleLogin:', error);
-      const errorMessages: { [key: string]: string } = {
-        'Invalid credentials': 'Email ou senha incorretos',
-        'User not found': 'Usuário não encontrado',
-        'Account not verified': 'Conta não verificada. Verifique seu email',
-        'Account disabled': 'Conta desativada. Entre em contato com o suporte'
-      };
-
-      Alert.alert(
-        'Erro ao fazer login',
-        errorMessages[error?.message] || error?.message || 'Ocorreu um erro inesperado. Tente novamente mais tarde'
-      );
+      
+      // Mapear erros para mensagens amigáveis
+      let errorMsg = 'Ocorreu um erro inesperado. Tente novamente.';
+      
+      if (typeof error === 'string') {
+        if (error.includes('senha') || error.includes('Senha') || error.includes('incorreta')) {
+          errorMsg = '❌ Email ou senha incorretos. Verifique seus dados e tente novamente.';
+        } else if (error.includes('não encontrado') || error.includes('not found')) {
+          errorMsg = '❌ Usuário não encontrado. Verifique o email digitado.';
+        } else {
+          errorMsg = `❌ ${error}`;
+        }
+      }
+      
+      setErrorMessage(errorMsg);
+      console.error('💬 Mensagem de erro exibida:', errorMsg);
     }
   };
 
@@ -95,6 +99,12 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
           <Text style={styles.title}>Bem-vindo de volta!</Text>
           <Text style={styles.subtitle}>Acesse sua conta para continuar</Text>
         </View>
+
+        {errorMessage ? (
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>{errorMessage}</Text>
+          </View>
+        ) : null}
 
         <View style={styles.form}>
           <Input
@@ -187,6 +197,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666',
     textAlign: 'center',
+  },
+  errorContainer: {
+    backgroundColor: '#ffebee',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 15,
+    borderLeftWidth: 4,
+    borderLeftColor: '#f44336',
+  },
+  errorText: {
+    color: '#c62828',
+    fontSize: 14,
+    fontWeight: '500',
   },
   form: {
     width: '100%',

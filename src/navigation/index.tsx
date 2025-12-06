@@ -26,12 +26,15 @@ export const Navigation = () => {
   useEffect(() => {
     console.log('🔄 Navigation atualizada!');
     console.log('🔍 Token:', token ? 'Presente' : 'Ausente');
+    console.log('🔍 Token valor:', token);
     console.log('🔍 User:', user?.email || 'Nenhum');
+    console.log('🔍 User completo:', JSON.stringify(user, null, 2));
     console.log('🔍 isLoading:', isLoading);
+    console.log('🚪 Mostrando telas:', token ? 'AUTENTICADAS (Home, etc)' : 'NÃO AUTENTICADAS (Login, etc)');
   }, [token, user, isLoading]);
 
   return (
-    <NavigationContainer>
+    <NavigationContainer key={token ? 'authenticated' : 'unauthenticated'}>
       <Stack.Navigator
         screenOptions={{
           headerShown: false,
