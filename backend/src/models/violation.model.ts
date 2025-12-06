@@ -10,6 +10,12 @@ export interface IViolation extends Document {
     address?: string;
   };
   images: string[];
+  imageValidation?: {
+    confidence: number;
+    flags: string[];
+    hash: string;
+    validatedAt: Date;
+  }[];
   plateNumber?: string;
   status: 'pending' | 'reviewing' | 'approved' | 'rejected';
   reviewedBy?: mongoose.Types.ObjectId;
@@ -48,6 +54,19 @@ const violationSchema = new Schema<IViolation>(
     images: [{
       type: String,
       required: [true, 'Pelo menos uma imagem é obrigatória'],
+    }],
+    imageValidation: [{
+      confidence: {
+        type: Number,
+        min: 0,
+        max: 100,
+      },
+      flags: [String],
+      hash: String,
+      validatedAt: {
+        type: Date,
+        default: Date.now,
+      },
     }],
     plateNumber: {
       type: String,

@@ -10,6 +10,7 @@ import { protect, restrictTo } from '../middleware/auth.middleware';
 import { upload } from '../utils/upload';
 import { processImages } from '../middleware/image.middleware';
 import { validateRequest } from '../middleware/validation.middleware';
+import { validateImageAuthenticityDev } from '../middleware/image-validation.middleware';
 import { violationSchema, statusUpdateSchema } from '../utils/validation.schemas';
 
 const router = express.Router();
@@ -20,6 +21,7 @@ router.use(protect);
 // Rotas públicas (para usuários autenticados)
 router.post('/',
   upload.array('images', 5),
+  validateImageAuthenticityDev, // Validação de autenticidade de imagem
   processImages,
   validateRequest(violationSchema),
   createViolation as any

@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { Violation } from '../models/violation.model';
+import { ImageValidationRequest } from '../middleware/image-validation.middleware';
 
 interface RequestWithUser extends Request {
   user: {
@@ -11,7 +12,9 @@ interface RequestWithUser extends Request {
   };
 }
 
-export const createViolation = async (req: RequestWithUser, res: Response): Promise<Response> => {
+interface ViolationRequest extends RequestWithUser, ImageValidationRequest {}
+
+export const createViolation = async (req: ViolationRequest, res: Response): Promise<Response> => {
   try {
     if (!req.user) {
       return res.status(401).json({
@@ -38,6 +41,14 @@ export const createViolation = async (req: RequestWithUser, res: Response): Prom
       });
     }
 
+    // Preparar dados de validação da imagem
+    const imageValidation = req.imageValidation ? [{
+      confidence: req.imageValidation.confidence,
+      flags: req.imageValidation.flags,
+      hash: req.imageValidation.hash,
+      validatedAt: new Date(),
+    }] : undefined;
+
     const violation = await Violation.create({
       user: req.user._id,
       violationType,
@@ -48,6 +59,7 @@ export const createViolation = async (req: RequestWithUser, res: Response): Prom
         address: location.address,
       },
       images,
+      imageValidation,
       plateNumber,
     });
 
