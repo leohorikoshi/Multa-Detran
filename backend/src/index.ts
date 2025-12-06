@@ -38,9 +38,11 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/detran-de
 // Rotas
 import authRoutes from './routes/auth.routes';
 import violationRoutes from './routes/violation.routes';
+import notificationRoutes from './routes/notification.routes';
 
 app.use('/api/auth', authRoutes);
 app.use('/api/violations', violationRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // Middleware de erro global
 app.use(errorHandler);

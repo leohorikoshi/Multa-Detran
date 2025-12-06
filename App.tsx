@@ -5,6 +5,18 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { store } from './src/store';
 import { Platform, Linking } from 'react-native';
 import { ThemeProvider } from './src/contexts/ThemeContext';
+import * as Notifications from 'expo-notifications';
+
+// Configurar comportamento padrão de notificações
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+    shouldShowBanner: true,
+    shouldShowList: true,
+  }),
+});
 
 // Importar estilos CSS para web
 if (Platform.OS === 'web') {
