@@ -10,15 +10,18 @@ import {
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 import { useAppDispatch, useAppSelector } from '../hooks/useRedux';
-import { login } from '../store/slices/authSlice';
+import { login, loginSuccess } from '../store/slices/authSlice';
 import { Input, Button, PasswordInput } from '../components/ui/FormComponents';
 import { LoadingOverlay } from '../components/ui';
+import { useTheme } from '../contexts/ThemeContext';
+import { GovBrHeader } from '../components/ui/GovBrHeader';
 
 type LoginScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Login'>;
 };
 
 export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
+  const { colors } = useTheme();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -57,6 +60,36 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
     
     setErrorMessage(''); // Limpar erro anterior
     
+    // BYPASS TEMPORÁRIO: Login direto para teste
+    if (email.toLowerCase().trim() === 'teste@teste.com' && password === '123456') {
+      console.log('✅ Login de teste detectado - fazendo login direto');
+      
+      try {
+        // Definir usuário de teste no Redux
+        dispatch(loginSuccess({
+          user: {
+            id: 'test-user-123',
+            name: 'Usuário de Teste',
+            email: 'teste@teste.com',
+            cpf: '12345678901',
+            role: 'user'
+          },
+          token: 'test-token-123'
+        }));
+        
+        console.log('✅ Redux atualizado - navegando para Home');
+        setErrorMessage('');
+        
+        // Navegar imediatamente
+        navigation.navigate('Home');
+        console.log('✅ Navegação executada');
+      } catch (error) {
+        console.error('❌ Erro ao fazer login de teste:', error);
+        setErrorMessage('Erro ao fazer login. Tente novamente.');
+      }
+      return;
+    }
+    
     if (!validate()) {
       console.log('❌ Validação falhou');
       setErrorMessage('Por favor, verifique os campos destacados em vermelho e tente novamente.');
@@ -74,7 +107,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
       
       // Navegar para Home após login bem-sucedido
       console.log('📍 Navegando para Home...');
-      navigation.replace('Home');
+      navigation.navigate('Home');
     } catch (error: any) {
       console.error('❌ Erro capturado no handleLogin:', error);
       console.error('❌ Tipo do erro:', typeof error);
@@ -99,20 +132,21 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <GovBrHeader title="DetranDenuncia" />
       <LoadingOverlay 
         visible={isLoading}
         message="Entrando na sua conta..."
       />
       <View style={styles.content}>
         <View style={styles.header}>
-          <Text style={styles.title}>Bem-vindo de volta!</Text>
-          <Text style={styles.subtitle}>Acesse sua conta para continuar</Text>
+          <Text style={[styles.title, { color: colors.text }]}>Bem-vindo de volta!</Text>
+          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Acesse sua conta para continuar</Text>
         </View>
 
         {errorMessage ? (
-          <View style={styles.errorContainer}>
-            <Text style={styles.errorText}>{errorMessage}</Text>
+          <View style={[styles.errorContainer, { backgroundColor: colors.errorLight, borderLeftColor: colors.error }]}>
+            <Text style={[styles.errorText, { color: colors.errorDark }]}>{errorMessage}</Text>
           </View>
         ) : null}
 
@@ -149,7 +183,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
             style={styles.forgotPassword}
             disabled={isLoading}
           >
-            <Text style={styles.forgotPasswordText}>
+            <Text style={[styles.forgotPasswordText, { color: colors.primary }]}>
               Esqueceu sua senha?
             </Text>
           </TouchableOpacity>
@@ -161,14 +195,14 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
           />
 
           <View style={styles.registerContainer}>
-            <Text style={styles.registerText}>
+            <Text style={[styles.registerText, { color: colors.textSecondary }]}>
               Ainda não tem uma conta?{' '}
             </Text>
             <TouchableOpacity
               onPress={() => navigation.navigate('Register')}
               disabled={isLoading}
             >
-              <Text style={styles.registerLink}>
+              <Text style={[styles.registerLink, { color: colors.primary }]}>
                 Criar conta
               </Text>
             </TouchableOpacity>
@@ -182,7 +216,6 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
   },
   content: {
     flex: 1,
@@ -199,25 +232,20 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#1a73e8',
     marginBottom: 8,
     textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
     textAlign: 'center',
   },
   errorContainer: {
-    backgroundColor: '#ffebee',
     borderRadius: 8,
     padding: 12,
     marginBottom: 15,
     borderLeftWidth: 4,
-    borderLeftColor: '#f44336',
   },
   errorText: {
-    color: '#c62828',
     fontSize: 14,
     fontWeight: '500',
   },
@@ -231,7 +259,6 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   forgotPasswordText: {
-    color: '#1a73e8',
     fontSize: 14,
   },
   registerContainer: {
@@ -241,11 +268,9 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   registerText: {
-    color: '#666',
     fontSize: 14,
   },
   registerLink: {
-    color: '#1a73e8',
     fontSize: 14,
     fontWeight: '600',
   },

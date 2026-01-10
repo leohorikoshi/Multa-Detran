@@ -8,10 +8,13 @@
     "dev": "nodemon --exec ts-node src/index.ts",
     "dev:test": "cross-env USE_MOCK_DB=true nodemon --exec ts-node src/index-test.ts",
     "build": "tsc",
+    "postinstall": "npm run build",
     "watch": "tsc -w",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "test:mongodb": "node test-mongodb.js",
+    "create:user": "node create-user-mongodb.js"
   },
   "keywords": [
     "detran",
@@ -29,7 +32,7 @@
     "express": "^5.1.0",
     "firebase-admin": "^13.6.0",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.19.3",
+    "mongoose": "^8.21.0",
     "morgan": "^1.10.1",
     "multer": "^2.0.2",
     "sharp": "^0.34.5",

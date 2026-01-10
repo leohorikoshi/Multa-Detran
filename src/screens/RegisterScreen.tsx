@@ -18,18 +18,23 @@ import { Input, Button, PasswordInput } from '../components/ui/FormComponents';
 import { FormContainer, FormGroup } from '../components/ui/FormContainer';
 import { LoadingOverlay } from '../components/ui';
 import { useFormValidation, commonValidationRules } from '../hooks/useFormValidation';
+import { GovBrHeader } from '../components/ui/GovBrHeader';
+import { useTheme } from '../contexts/ThemeContext';
 
 type RegisterScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Register'>;
 };
 
 export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) => {
+  const { colors } = useTheme();
   const { width, height } = useWindowDimensions();
   const dispatch = useAppDispatch();
   const { isLoading, error } = useAppSelector((state) => state.auth);
   
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   
   const isSmallScreen = width < 380;
   const isLandscape = width > height;
@@ -68,15 +73,16 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) =>
     console.log('🔵 handleRegister chamado');
     console.log('📝 Values:', values);
     
+    // Limpar mensagens anteriores
+    setSuccessMessage('');
+    setErrorMessage('');
+    
     const validationResult = validateAllFields();
     console.log('✅ Validação:', validationResult);
     
     if (!validationResult) {
       console.log('❌ Validação falhou, erros:', errors);
-      Alert.alert(
-        'Campos Inválidos',
-        'Por favor, verifique os campos destacados em vermelho e tente novamente.'
-      );
+      setErrorMessage('Por favor, verifique os campos destacados em vermelho.');
       return;
     }
 
@@ -90,52 +96,44 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) =>
     console.log('📤 Enviando dados:', userData);
 
     try {
-      console.log('📤 Enviando registro...');
+      console.log('📤 Chamando dispatch(register)...');
       const result = await dispatch(register(userData)).unwrap();
       console.log('✅ Registro bem-sucedido:', result);
       
-      // Alert na web é problemático, vamos usar window.alert ou navegar direto
-      if (Platform.OS === 'web') {
-        console.log('🌐 Web: Navegando automaticamente para Home...');
-        navigation.replace('Home');
-      } else {
-        Alert.alert(
-          'Sucesso!',
-          'Sua conta foi criada com sucesso!',
-          [
-            { 
-              text: 'OK',
-              onPress: () => {
-                console.log('📍 Navegando para Home após registro...');
-                navigation.replace('Home');
-              }
-            }
-          ]
-        );
-      }
+      // Mostrar mensagem de sucesso
+      setSuccessMessage('✅ Conta criada com sucesso!\n📧 Email: ' + userData.email + '\n🔑 Senha: ******\n\nRedirecionando...');
+      
+      // Aguardar um pouco para mostrar a mensagem
+      setTimeout(() => {
+        console.log('🌐 Navegando automaticamente para Home...');
+        navigation.navigate('Home' as never);
+      }, 3000);
     } catch (error: any) {
       console.error('❌ Erro capturado no RegisterScreen:', error);
       console.error('Tipo do erro:', typeof error);
+      console.error('Stack:', error?.stack);
       
-      let errorMessage = 'Ocorreu um erro ao criar sua conta. Por favor, tente novamente.';
+      let errorMsg = 'Ocorreu um erro ao criar sua conta. Por favor, tente novamente.';
       
       // Se error é uma string (vem do throw no Redux)
       if (typeof error === 'string') {
-        errorMessage = error;
+        errorMsg = error;
       }
       // Se error tem uma propriedade message
       else if (error?.message) {
-        errorMessage = error.message;
+        errorMsg = error.message;
       }
       
       // Personalizar mensagens comuns
-      if (errorMessage.includes('já cadastrado') || errorMessage.includes('already exists')) {
-        errorMessage = 'Este email ou CPF já está cadastrado. Tente fazer login ou use outros dados.';
+      if (errorMsg.includes('já cadastrado') || errorMsg.includes('already exists')) {
+        errorMsg = 'Este email ou CPF já está cadastrado. Tente fazer login ou use outros dados.';
       }
       
-      Alert.alert('Erro no Cadastro', errorMessage);
+      console.error('❌ Erro no cadastro:', errorMsg);
+      setErrorMessage(errorMsg);
+      Alert.alert('Erro no Cadastro', errorMsg);
     }
-  }, [dispatch, values, validateAllFields, errors]);
+  }, [dispatch, values, validateAllFields, errors, navigation]);
 
   const formatCPF = (value: string) => {
     const numbers = value.replace(/[^\d]/g, '');
@@ -150,7 +148,12 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) =>
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <GovBrHeader 
+        title="DetranDenuncia" 
+        showBack 
+        onBackPress={() => navigation.goBack()}
+      />
       <LoadingOverlay 
         visible={isLoading}
         message="Criando sua conta..."
@@ -164,10 +167,10 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) =>
           isLandscape && styles.landscapeScrollContent
         ]}>
           <View style={[styles.header, isLandscape && styles.landscapeHeader]}>
-            <Text style={[styles.title, isSmallScreen && styles.smallScreenTitle]}>
+            <Text style={[styles.title, { color: colors.text }, isSmallScreen && styles.smallScreenTitle]}>
               Criar Conta
             </Text>
-            <Text style={[styles.subtitle, isSmallScreen && styles.smallScreenSubtitle]}>
+            <Text style={[styles.subtitle, { color: colors.textSecondary }, isSmallScreen && styles.smallScreenSubtitle]}>
               Preencha seus dados para se cadastrar
             </Text>
           </View>
@@ -247,6 +250,24 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) =>
             </FormGroup>
 
             <FormGroup>
+              {errorMessage ? (
+                <View style={[styles.errorContainer, { 
+                  backgroundColor: colors.errorLight, 
+                  borderColor: colors.error 
+                }]}>
+                  <Text style={[styles.errorText, { color: colors.errorDark }]}>{errorMessage}</Text>
+                </View>
+              ) : null}
+              
+              {successMessage ? (
+                <View style={[styles.successContainer, { 
+                  backgroundColor: colors.successLight, 
+                  borderColor: colors.success 
+                }]}>
+                  <Text style={[styles.successText, { color: colors.successDark }]}>{successMessage}</Text>
+                </View>
+              ) : null}
+              
               <Button
                 title="Criar conta"
                 onPress={handleRegister}
@@ -270,7 +291,6 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ navigation }) =>
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
   },
   content: {
     flex: 1,
@@ -305,7 +325,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#1a73e8',
     marginBottom: 8,
     textAlign: 'center',
   },
@@ -314,7 +333,6 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
     textAlign: 'center',
   },
   smallScreenSubtitle: {
@@ -340,27 +358,45 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
     padding: 15,
     borderRadius: 8,
     marginBottom: 15,
     fontSize: 16,
   },
   button: {
-    backgroundColor: '#1a73e8',
     padding: 15,
     borderRadius: 8,
     alignItems: 'center',
     marginBottom: 15,
   },
   buttonText: {
-    color: '#fff',
     fontSize: 16,
     fontWeight: '600',
   } as const,
   linkText: {
-    color: '#1a73e8',
     textAlign: 'center',
     fontSize: 14,
+  },
+  errorContainer: {
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 16,
+    marginBottom: 16,
+  },
+  errorText: {
+    fontSize: 14,
+    textAlign: 'center',
+    fontWeight: '600',
+  },
+  successContainer: {
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 16,
+    marginBottom: 16,
+  },
+  successText: {
+    fontSize: 16,
+    textAlign: 'center',
+    fontWeight: '600',
   },
 });

@@ -2,7 +2,7 @@ import { Document } from 'mongoose';
 import { IUser } from './auth.types';
 
 export interface IUserDocument extends Document, IUser {
-  _id: string;
+  _id: any;
   createdAt: Date;
   updatedAt: Date;
   comparePassword(candidatePassword: string): Promise<boolean>;
@@ -25,7 +25,7 @@ export interface IViolation {
 }
 
 export interface IViolationDocument extends Document, IViolation {
-  _id: string;
+  _id: any;
   createdAt: Date;
   updatedAt: Date;
 }

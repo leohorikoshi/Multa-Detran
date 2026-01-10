@@ -5,7 +5,7 @@
  */
 
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { Appearance, ColorSchemeName } from 'react-native';
+import { Appearance, ColorSchemeName, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Colors, Gradients, Shadows, ColorScheme, ThemeColors, ThemeGradients, ThemeShadows } from '../constants/colors';
 
@@ -61,20 +61,26 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 
   const loadTheme = async () => {
     try {
-      // Temporariamente sem persistência - sempre usa 'light'
-      setThemeModeState('light');
-      console.log('🎨 Theme: Usando light mode (sem persistência)');
+      const savedTheme = await AsyncStorage.getItem(THEME_STORAGE_KEY);
+      if (savedTheme) {
+        setThemeModeState(savedTheme as ThemeMode);
+        console.log('🎨 Theme carregado:', savedTheme);
+      } else {
+        const systemTheme = Appearance.getColorScheme();
+        setThemeModeState('auto');
+        console.log('🎨 Theme: Usando automático (sistema)');
+      }
     } catch (error) {
       console.error('Erro ao carregar tema:', error);
-      setThemeModeState('light');
+      setThemeModeState('auto');
     }
   };
 
   const setThemeMode = async (mode: ThemeMode) => {
     try {
-      // Temporariamente sem salvar no storage
+      await AsyncStorage.setItem(THEME_STORAGE_KEY, mode);
       setThemeModeState(mode);
-      console.log('🎨 Theme mudado para:', mode);
+      console.log('✅ Tema alterado para:', mode);
     } catch (error) {
       console.error('Erro ao salvar tema:', error);
     }
@@ -97,7 +103,9 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
         toggleTheme,
       }}
     >
-      {children}
+      <View key={theme} style={{ flex: 1 }}>
+        {children}
+      </View>
     </ThemeContext.Provider>
   );
 };

@@ -11,6 +11,7 @@ export type RootStackParamList = {
   Profile: undefined;
   ViolationDetails: { violationId: string };
   AdminDashboard: undefined;
+  AdminUsers: undefined;
 };
 
 export type RootStackScreenProps<T extends keyof RootStackParamList> = NativeStackScreenProps<RootStackParamList, T>;

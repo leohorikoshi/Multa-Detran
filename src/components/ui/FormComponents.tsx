@@ -1,5 +1,6 @@
 import React from 'react';
 import { Text, TextInput, TouchableOpacity, StyleSheet, TextInputProps, TouchableOpacityProps, TextStyle, Platform, View } from 'react-native';
+import { useTheme } from '../../contexts/ThemeContext';
 
 // Input Component
 interface InputProps extends TextInputProps {
@@ -8,6 +9,8 @@ interface InputProps extends TextInputProps {
 }
 
 export const FormInput: React.FC<InputProps> = ({ error, label, style, onChangeText, onBlur, value, placeholder, secureTextEntry, keyboardType, editable = true, maxLength, autoCapitalize, autoCorrect, ...props }) => {
+  const { colors } = useTheme();
+  
   // Para web, usar input HTML nativo para evitar problemas de foco
   if (Platform.OS === 'web') {
     const inputType = secureTextEntry ? 'password' : 
@@ -17,7 +20,7 @@ export const FormInput: React.FC<InputProps> = ({ error, label, style, onChangeT
     
     return (
       <>
-        {label && <Text style={styles.label}>{label}</Text>}
+        {label && <Text style={[styles.label, { color: colors.text }]}>{label}</Text>}
         <input
           type={inputType}
           inputMode={keyboardType === 'numeric' ? 'numeric' : keyboardType === 'email-address' ? 'email' : 'text'}
@@ -48,20 +51,20 @@ export const FormInput: React.FC<InputProps> = ({ error, label, style, onChangeT
           style={{
             width: '100%',
             height: 50,
-            backgroundColor: '#FFF',
+            backgroundColor: colors.surface,
             borderWidth: 1,
             borderStyle: 'solid',
-            borderColor: error ? '#ff4444' : '#ddd',
+            borderColor: error ? colors.error : colors.border,
             borderRadius: 8,
             paddingLeft: 15,
             paddingRight: 15,
             fontSize: 16,
-            color: '#333',
+            color: colors.text,
             outline: 'none',
             fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
           }}
         />
-        {error && <Text style={styles.errorText}>{error}</Text>}
+        {error && <Text style={[styles.errorText, { color: colors.error }]}>{error}</Text>}
       </>
     );
   }
@@ -69,10 +72,15 @@ export const FormInput: React.FC<InputProps> = ({ error, label, style, onChangeT
   // Para mobile, usar TextInput do React Native
   return (
     <>
-      {label && <Text style={styles.label}>{label}</Text>}
+      {label && <Text style={[styles.label, { color: colors.text }]}>{label}</Text>}
       <TextInput
-        style={[styles.input, error && styles.inputError, style]}
-        placeholderTextColor="#666"
+        style={[
+          styles.input, 
+          { backgroundColor: colors.surface, borderColor: colors.border, color: colors.text },
+          error && { borderColor: colors.error },
+          style
+        ]}
+        placeholderTextColor={colors.textSecondary}
         underlineColorAndroid="transparent"
         autoCorrect={false}
         value={value}
@@ -86,7 +94,7 @@ export const FormInput: React.FC<InputProps> = ({ error, label, style, onChangeT
         autoCapitalize={autoCapitalize}
         {...props}
       />
-      {error && <Text style={styles.errorText}>{error}</Text>}
+      {error && <Text style={[styles.errorText, { color: colors.error }]}>{error}</Text>}
     </>
   );
 };
@@ -108,10 +116,12 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
   style,
   ...props 
 }) => {
+  const { colors } = useTheme();
+  
   if (Platform.OS === 'web') {
     return (
       <>
-        {label && <Text style={styles.label}>{label}</Text>}
+        {label && <Text style={[styles.label, { color: colors.text }]}>{label}</Text>}
         <View style={styles.passwordContainer}>
           <input
             {...(props as any)}
@@ -141,15 +151,15 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
             style={{
               width: '100%',
               height: 50,
-              backgroundColor: '#FFF',
+              backgroundColor: colors.surface,
               borderWidth: 1,
               borderStyle: 'solid',
-              borderColor: error ? '#ff4444' : '#ddd',
+              borderColor: error ? colors.error : colors.border,
               borderRadius: 8,
               paddingLeft: 15,
               paddingRight: 50,
               fontSize: 16,
-              color: '#333',
+              color: colors.text,
               outline: 'none',
               fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
             }}
@@ -161,7 +171,7 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
             <Text style={styles.eyeIcon}>{showPassword ? '👁️' : '👁️‍🗨️'}</Text>
           </TouchableOpacity>
         </View>
-        {error && <Text style={styles.errorText}>{error}</Text>}
+        {error && <Text style={[styles.errorText, { color: colors.error }]}>{error}</Text>}
       </>
     );
   }
@@ -169,12 +179,18 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
   // Mobile
   return (
     <>
-      {label && <Text style={styles.label}>{label}</Text>}
+      {label && <Text style={[styles.label, { color: colors.text }]}>{label}</Text>}
       <View style={styles.passwordContainer}>
         <TextInput
           {...props}
-          style={[styles.input, styles.passwordInput, error && styles.inputError, style]}
-          placeholderTextColor="#666"
+          style={[
+            styles.input, 
+            styles.passwordInput,
+            { backgroundColor: colors.surface, borderColor: colors.border, color: colors.text },
+            error && { borderColor: colors.error },
+            style
+          ]}
+          placeholderTextColor={colors.textSecondary}
           underlineColorAndroid="transparent"
           autoCorrect={false}
           secureTextEntry={!showPassword}
@@ -186,7 +202,7 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
           <Text style={styles.eyeIcon}>{showPassword ? '👁️' : '👁️‍🗨️'}</Text>
         </TouchableOpacity>
       </View>
-      {error && <Text style={styles.errorText}>{error}</Text>}
+      {error && <Text style={[styles.errorText, { color: colors.error }]}>{error}</Text>}
     </>
   );
 };
@@ -207,56 +223,56 @@ export const Button: React.FC<ButtonProps> = ({
   disabled,
   loading,
   ...props
-}) => (
-  <TouchableOpacity
-    style={[
-      styles.button,
-      variant === 'secondary' && styles.buttonSecondary,
-      variant === 'outline' && styles.buttonOutline,
-      (disabled || loading) && styles.buttonDisabled,
-      style,
-    ]}
-    disabled={disabled || loading}
-    {...props}
-  >
-    <Text
+}) => {
+  const { colors } = useTheme();
+  
+  return (
+    <TouchableOpacity
       style={[
-        styles.buttonText,
-        variant === 'secondary' && styles.buttonTextSecondary,
-        variant === 'outline' && styles.buttonTextOutline,
-        (disabled || loading) && styles.buttonTextDisabled,
-        titleStyle,
+        styles.button,
+        { backgroundColor: colors.primary },
+        variant === 'secondary' && { backgroundColor: colors.secondary, borderWidth: 1, borderColor: colors.secondary },
+        variant === 'outline' && { backgroundColor: 'transparent', borderWidth: 2, borderColor: colors.primary },
+        (disabled || loading) && { opacity: 0.5 },
+        style,
       ]}
+      disabled={disabled || loading}
+      {...props}
     >
-      {loading ? 'Carregando...' : title}
-    </Text>
-  </TouchableOpacity>
-);
+      <Text
+        style={[
+          styles.buttonText,
+          { color: '#FFFFFF' },
+          variant === 'secondary' && { color: colors.text },
+          variant === 'outline' && { color: colors.primary },
+          titleStyle,
+        ]}
+      >
+        {loading ? 'Carregando...' : title}
+      </Text>
+    </TouchableOpacity>
+  );
+};
 
 const styles = StyleSheet.create({
   label: {
-    fontSize: 16,
-    color: '#333',
+    fontSize: 14,
     marginBottom: 8,
-    fontWeight: '500',
+    fontWeight: '600',
+    letterSpacing: 0.3,
   },
   input: {
-    backgroundColor: '#f5f5f5',
-    borderRadius: 8,
-    padding: 15,
+    borderRadius: 4,
+    padding: 12,
     marginBottom: 4,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: '#e0e0e0',
-  },
-  inputError: {
-    borderColor: '#ff4444',
   },
   errorText: {
-    color: '#ff4444',
     fontSize: 12,
     marginBottom: 10,
     marginLeft: 4,
+    fontWeight: '500',
   },
   passwordContainer: {
     position: 'relative',
@@ -270,7 +286,7 @@ const styles = StyleSheet.create({
   eyeButton: {
     position: 'absolute',
     right: 15,
-    top: 15,
+    top: 12,
     padding: 5,
     zIndex: 10,
   },
@@ -278,36 +294,16 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   button: {
-    backgroundColor: '#1a73e8',
-    borderRadius: 8,
-    padding: 15,
+    borderRadius: 100,
+    paddingVertical: 14,
+    paddingHorizontal: 32,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  buttonSecondary: {
-    backgroundColor: '#34a853',
-  },
-  buttonOutline: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: '#1a73e8',
-  },
-  buttonDisabled: {
-    backgroundColor: '#cccccc',
-    borderColor: '#cccccc',
+    minHeight: 48,
   },
   buttonText: {
-    color: '#ffffff',
     fontSize: 16,
     fontWeight: '600',
-  },
-  buttonTextSecondary: {
-    color: '#ffffff',
-  },
-  buttonTextOutline: {
-    color: '#1a73e8',
-  },
-  buttonTextDisabled: {
-    color: '#666666',
+    letterSpacing: 0.5,
   },
 });

@@ -7,12 +7,12 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 import { VIOLATION_STATUS } from '../constants';
 import { ShareModal } from '../components/share/ShareModal';
 import type { ShareViolationData } from '../utils/shareService';
+import { useTheme } from '../contexts/ThemeContext';
 
 type MyReportsScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'MyReports'>;
@@ -29,6 +29,7 @@ type Report = {
 };
 
 export const MyReportsScreen: React.FC<MyReportsScreenProps> = ({ navigation }) => {
+  const { colors } = useTheme();
   const [shareModalVisible, setShareModalVisible] = useState(false);
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
 
@@ -58,9 +59,9 @@ export const MyReportsScreen: React.FC<MyReportsScreenProps> = ({ navigation }) 
   };
 
   const renderItem = ({ item }: { item: Report }) => (
-    <TouchableOpacity style={styles.reportCard}>
+    <TouchableOpacity style={[styles.reportCard, { backgroundColor: colors.surface }]}>
       <View style={styles.reportHeader}>
-        <Text style={styles.reportType}>{item.violationType}</Text>
+        <Text style={[styles.reportType, { color: colors.text }]}>{item.violationType}</Text>
         <View style={styles.headerActions}>
           <Text style={[
             styles.statusBadge,
@@ -73,7 +74,7 @@ export const MyReportsScreen: React.FC<MyReportsScreenProps> = ({ navigation }) 
             style={styles.shareIconButton}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
-            <Ionicons name="share-social-outline" size={20} color="#1a73e8" />
+            <Text style={styles.shareIcon}>📤</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -88,7 +89,7 @@ export const MyReportsScreen: React.FC<MyReportsScreenProps> = ({ navigation }) 
         ))}
       </View>
 
-      <Text style={styles.date}>
+      <Text style={[styles.date, { color: colors.textSecondary }]}>
         {new Date(item.createdAt).toLocaleDateString('pt-BR')}
       </Text>
     </TouchableOpacity>
@@ -97,22 +98,25 @@ export const MyReportsScreen: React.FC<MyReportsScreenProps> = ({ navigation }) 
   const getStatusColor = (status: keyof typeof VIOLATION_STATUS) => {
     switch (status) {
       case 'pending':
-        return '#ffa726';
+        return colors.warning;
       case 'reviewing':
-        return '#29b6f6';
+        return colors.info;
       case 'approved':
-        return '#66bb6a';
+        return colors.success;
       case 'rejected':
-        return '#ef5350';
+        return colors.error;
       default:
-        return '#999';
+        return colors.textTertiary;
     }
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Minhas Denúncias</Text>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={[styles.header, { backgroundColor: colors.primary }]}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <Text style={[styles.backButtonText, { color: colors.textInverse }]}>← Voltar</Text>
+        </TouchableOpacity>
+        <Text style={[styles.title, { color: colors.textInverse }]}>Minhas Denúncias</Text>
       </View>
 
       <FlatList
@@ -142,22 +146,25 @@ export const MyReportsScreen: React.FC<MyReportsScreenProps> = ({ navigation }) 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
   },
   header: {
     padding: 20,
-    backgroundColor: '#1a73e8',
+  },
+  backButton: {
+    marginBottom: 5,
+  },
+  backButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
   },
   title: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#fff',
   },
   list: {
     padding: 20,
   },
   reportCard: {
-    backgroundColor: '#fff',
     borderRadius: 10,
     padding: 15,
     marginBottom: 15,
@@ -181,10 +188,12 @@ const styles = StyleSheet.create({
   shareIconButton: {
     padding: 4,
   },
+  shareIcon: {
+    fontSize: 20,
+  },
   reportType: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
     flex: 1,
   },
   statusBadge: {
@@ -206,7 +215,6 @@ const styles = StyleSheet.create({
   },
   date: {
     fontSize: 12,
-    color: '#666',
     textAlign: 'right',
   },
 });

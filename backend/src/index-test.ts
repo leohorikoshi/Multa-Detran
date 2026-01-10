@@ -40,10 +40,19 @@ app.get('/health', (_req, res) => {
 // Middleware de erro global
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 3000;
+const PORT = Number(process.env.PORT) || 3000;
+const HOST = '0.0.0.0';
 
-app.listen(PORT, () => {
-  console.log(`🚀 Servidor rodando na porta ${PORT}`);
+const server = app.listen(PORT, HOST, () => {
+  console.log(`🚀 Servidor rodando em ${HOST}:${PORT}`);
   console.log(`📡 API disponível em: http://localhost:${PORT}`);
   console.log(`🔍 Health check: http://localhost:${PORT}/health`);
+}).on('error', (err: any) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(`❌ Porta ${PORT} já está em uso`);
+    process.exit(1);
+  } else {
+    console.error('❌ Erro ao iniciar servidor:', err);
+    process.exit(1);
+  }
 });

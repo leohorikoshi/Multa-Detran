@@ -1,51 +1,63 @@
 /**
  * Paleta de Cores - DetranDenuncia
- * Suporte a Light Mode e Dark Mode
+ * Padrão Detran-SP Profissional
  * Contraste WCAG AA: 4.5:1
  */
 
 export const Colors = {
   light: {
-    // Primary Colors
-    primary: '#1E88E5',      // Azul principal
-    primaryDark: '#1565C0',
-    primaryLight: '#42A5F5',
+    // Primary Colors - Detran-SP
+    primary: '#1565C0',      // Azul Detran-SP profissional
+    primaryDark: '#0D47A1',  // Azul escuro
+    primaryLight: '#1976D2', // Azul médio
     
     // Secondary Colors
-    secondary: '#FF6F00',    // Laranja para alertas
-    secondaryDark: '#E65100',
-    secondaryLight: '#FF9800',
+    secondary: '#1976D2',    // Azul secundário
+    secondaryDark: '#1565C0',
+    secondaryLight: '#42A5F5',
+    
+    // Support Colors
+    supportGreen: '#43A047', // Verde profissional
+    supportRed: '#E53935',   // Vermelho profissional
     
     // Background
-    background: '#FFFFFF',
-    backgroundSecondary: '#F5F5F5',
-    backgroundTertiary: '#EEEEEE',
+    background: '#F5F7FA',   // Cinza muito claro
+    backgroundSecondary: '#FFFFFF',
+    backgroundTertiary: '#FAFBFC',
     
     // Surface
     surface: '#FFFFFF',
-    surfaceElevated: '#FAFAFA',
+    surfaceElevated: '#FFFFFF',
     
     // Text
-    text: '#212121',
-    textSecondary: '#757575',
+    text: '#212121',         // Texto principal
+    textSecondary: '#616161',
     textTertiary: '#9E9E9E',
     textInverse: '#FFFFFF',
     
     // Border
-    border: '#E0E0E0',
+    border: '#E0E0E0',       // Borda suave
     borderLight: '#F5F5F5',
     
     // Status
-    success: '#4CAF50',
-    warning: '#FFC107',
-    error: '#F44336',
-    info: '#2196F3',
+    success: '#43A047',      // Verde
+    successLight: '#E8F5E9',
+    successDark: '#2E7D32',
+    warning: '#FB8C00',      // Laranja
+    warningLight: '#FFF3E0',
+    warningDark: '#E65100',
+    error: '#E53935',        // Vermelho
+    errorLight: '#FFEBEE',
+    errorDark: '#C62828',
+    info: '#1976D2',         // Azul
+    infoLight: '#E3F2FD',
+    infoDark: '#1565C0',
     
     // Violation Status
-    pending: '#FFC107',      // Amarelo
-    approved: '#4CAF50',     // Verde
-    rejected: '#F44336',     // Vermelho
-    analyzing: '#2196F3',    // Azul
+    pending: '#FB8C00',      // Laranja
+    approved: '#43A047',     // Verde
+    rejected: '#E53935',     // Vermelho
+    analyzing: '#1976D2',    // Azul
     
     // Overlay
     overlay: 'rgba(0, 0, 0, 0.5)',
@@ -57,18 +69,22 @@ export const Colors = {
   },
   
   dark: {
-    // Primary Colors
-    primary: '#42A5F5',      // Azul mais claro para dark mode
-    primaryDark: '#1E88E5',
+    // Primary Colors - Detran-SP Dark
+    primary: '#42A5F5',      // Azul claro para dark
+    primaryDark: '#1976D2',  // Azul médio
     primaryLight: '#64B5F6',
     
     // Secondary Colors
-    secondary: '#FF9800',    // Laranja mais suave
-    secondaryDark: '#F57C00',
-    secondaryLight: '#FFB74D',
+    secondary: '#42A5F5',    // Azul secundário
+    secondaryDark: '#1976D2',
+    secondaryLight: '#64B5F6',
+    
+    // Support Colors
+    supportGreen: '#66BB6A', // Verde claro
+    supportRed: '#EF5350',   // Vermelho claro
     
     // Background
-    background: '#121212',
+    background: '#121212',   // Preto suave
     backgroundSecondary: '#1E1E1E',
     backgroundTertiary: '#2C2C2C',
     
@@ -79,7 +95,7 @@ export const Colors = {
     // Text
     text: '#FFFFFF',
     textSecondary: '#B0B0B0',
-    textTertiary: '#757575',
+    textTertiary: '#808080',
     textInverse: '#121212',
     
     // Border
@@ -88,9 +104,17 @@ export const Colors = {
     
     // Status
     success: '#66BB6A',
-    warning: '#FFD54F',
+    successLight: '#1B3A1F',
+    successDark: '#A5D6A7',
+    warning: '#FFA726',
+    warningLight: '#3A2E1F',
+    warningDark: '#FFB74D',
     error: '#EF5350',
+    errorLight: '#3A1F1F',
+    errorDark: '#E57373',
     info: '#42A5F5',
+    infoLight: '#1A2F3A',
+    infoDark: '#90CAF9',
     
     // Violation Status
     pending: '#FFD54F',      // Amarelo claro

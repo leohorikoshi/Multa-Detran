@@ -17,10 +17,6 @@ import {
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 import { VIOLATION_TYPES } from '../constants';
-import { Ionicons } from '@expo/vector-icons';
-import { useViolationForm } from '../hooks/useViolationForm';
-import { ImagePreview } from '../components/violation/ImagePreview';
-import { LoadingOverlay } from '../components/ui';
 
 type ReportViolationScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'ReportViolation'>;
@@ -58,7 +54,12 @@ export const ReportViolationScreen: React.FC<ReportViolationScreenProps> = ({
   return (
     <ScrollView style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.title}>Nova Denúncia</Text>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <Text style={styles.backButtonText}>← Voltar</Text>
+          </TouchableOpacity>
+          <Text style={styles.title}>Nova Denúncia</Text>
+        </View>
 
         <View style={styles.section}>
           <Text style={styles.label}>Tipo de Infração</Text>
@@ -153,6 +154,17 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 20,
+  },
+  header: {
+    marginBottom: 20,
+  },
+  backButton: {
+    marginBottom: 10,
+  },
+  backButtonText: {
+    color: '#1a73e8',
+    fontSize: 16,
+    fontWeight: '600',
   },
   title: {
     fontSize: 24,

@@ -3,7 +3,7 @@
  * Inclui: Theme Selector, Notificações, Perfil, Sobre
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -11,11 +11,45 @@ import {
   ScrollView,
   TouchableOpacity,
   Switch,
+  Alert,
+  TextInput,
 } from 'react-native';
 import { useTheme } from '../contexts/ThemeContext';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '../store';
+import { logout } from '../store/slices/authSlice';
 
-const SettingsScreen: React.FC = () => {
+const SettingsScreen: React.FC<{ navigation?: any }> = ({ navigation }) => {
   const { theme, themeMode, colors, setThemeMode } = useTheme();
+  const dispatch = useDispatch();
+  const user = useSelector((state: RootState) => state.auth.user);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+
+  const handleLogout = () => {
+    Alert.alert(
+      'Sair da Conta',
+      'Tem certeza que deseja sair?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Sair',
+          style: 'destructive',
+          onPress: () => {
+            dispatch(logout());
+            navigation?.replace('Welcome');
+          },
+        },
+      ]
+    );
+  };
+
+  const handleEditProfile = () => {
+    Alert.alert('Editar Perfil', 'Em breve você poderá editar seu perfil completo!');
+  };
+
+  const handleChangePassword = () => {
+    Alert.alert('Alterar Senha', 'Em breve você poderá alterar sua senha!');
+  };
 
   const getThemeLabel = (mode: string) => {
     switch (mode) {
@@ -34,7 +68,53 @@ const SettingsScreen: React.FC = () => {
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
       <View style={styles.header}>
+        {navigation && (
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <Text style={[styles.backButtonText, { color: colors.primary }]}>← Voltar</Text>
+          </TouchableOpacity>
+        )}
         <Text style={[styles.title, { color: colors.text }]}>Configurações</Text>
+      </View>
+
+      {/* Seção: Perfil */}
+      <View style={styles.section}>
+        <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>PERFIL</Text>
+
+        <View style={[styles.card, { backgroundColor: colors.surface }]}>
+          {/* Avatar e Nome */}
+          <View style={styles.profileHeader}>
+            <View style={[styles.avatar, { backgroundColor: colors.primary }]}>
+              <Text style={styles.avatarText}>
+                {user?.name?.charAt(0).toUpperCase() || 'U'}
+              </Text>
+            </View>
+            <View style={styles.profileInfo}>
+              <Text style={[styles.profileName, { color: colors.text }]}>
+                {user?.name || 'Usuário'}
+              </Text>
+              <Text style={[styles.profileEmail, { color: colors.textSecondary }]}>
+                {user?.email || 'email@exemplo.com'}
+              </Text>
+            </View>
+          </View>
+
+          {/* Opções do Perfil */}
+          <TouchableOpacity
+            style={[styles.menuItem, { borderTopColor: colors.border }]}
+            onPress={handleEditProfile}
+          >
+            <Text style={[styles.menuItemText, { color: colors.text }]}>✏️ Editar Perfil</Text>
+            <Text style={[styles.menuItemArrow, { color: colors.textSecondary }]}>›</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.menuItem, { borderTopColor: colors.border }]}
+            onPress={handleChangePassword}
+          >
+            <Text style={[styles.menuItemText, { color: colors.text }]}>🔒 Alterar Senha</Text>
+            <Text style={[styles.menuItemArrow, { color: colors.textSecondary }]}>›</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Seção: Aparência */}
@@ -102,6 +182,62 @@ const SettingsScreen: React.FC = () => {
             </TouchableOpacity>
 
             {/* Auto */}
+            <View style={styles.settingInfo}>
+              <Text style={[styles.cardTitle, { color: colors.text }]}>Notificações Push</Text>
+              <Text style={[styles.cardSubtitle, { color: colors.textSecondary }]}>
+                Receba atualizações sobre suas denúncias
+              </Text>
+            </View>
+            <Switch
+              value={notificationsEnabled}
+              onValueChange={setNotificationsEnabled}
+              trackColor={{ false: colors.border, true: colors.primary }}
+              thumbColor={colors.surface}
+            />
+          </View>
+        </View>
+      </View>
+
+      {/* Seção: Privacidade */}
+      <View style={styles.section}>
+        <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>PRIVACIDADE & DADOS</Text>
+
+        <View style={[styles.card, { backgroundColor: colors.surface }]}>
+          <TouchableOpacity style={styles.menuItem}>
+            <Text style={[styles.menuItemText, { color: colors.text }]}>📜 Termos de Uso</Text>
+            <Text style={[styles.menuItemArrow, { color: colors.textSecondary }]}>›</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={[styles.menuItem, { borderTopColor: colors.border }]}>
+            <Text style={[styles.menuItemText, { color: colors.text }]}>🔐 Política de Privacidade</Text>
+            <Text style={[styles.menuItemArrow, { color: colors.textSecondary }]}>›</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={[styles.menuItem, { borderTopColor: colors.border }]}>
+            <Text style={[styles.menuItemText, { color: colors.text }]}>🗑️ Excluir Minha Conta</Text>
+            <Text style={[styles.menuItemArrow, { color: colors.textSecondary }]}>›</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* Seção: Conta */}
+      <View style={styles.section}>
+        <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>CONTA</Text>
+
+        <TouchableOpacity
+          style={[styles.logoutButton, { backgroundColor: colors.error }]}
+          onPress={handleLogout}
+        >
+          <Text style={styles.logoutButtonText}>🚪 Sair da Conta</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Seção: Notificações (Futuro) */}
+      <View style={styles.section}>
+        <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>NOTIFICAÇÕES</Text>
+
+        <View style={[styles.card, { backgroundColor: colors.surface }]}>
+          <View style={styles.settingRow}>
             <TouchableOpacity
               style={[
                 styles.themeButton,
@@ -130,8 +266,10 @@ const SettingsScreen: React.FC = () => {
 
           <View style={[styles.infoBox, { backgroundColor: colors.backgroundSecondary }]}>
             <Text style={[styles.infoText, { color: colors.textSecondary }]}>
-              💡 <Text style={{ fontWeight: '600' }}>Tema atual:</Text> {getThemeLabel(themeMode)}
-              {themeMode === 'auto' && ` (Sistema: ${theme === 'dark' ? 'Escuro' : 'Claro'})`}
+              💡 <Text style={{ fontWeight: '600' }}>Tema atual:</Text>{' '}
+              {themeMode === 'light' && '☀️ Claro'}
+              {themeMode === 'dark' && '🌙 Escuro'}
+              {themeMode === 'auto' && `🔄 Automático (Sistema: ${theme === 'dark' ? '🌙 Escuro' : '☀️ Claro'})`}
             </Text>
           </View>
         </View>
@@ -186,6 +324,13 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingTop: 60,
   },
+  backButton: {
+    marginBottom: 10,
+  },
+  backButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
   title: {
     fontSize: 32,
     fontWeight: 'bold',
@@ -210,6 +355,59 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   cardSubtitle: {
+  profileHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  avatar: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
+  },
+  avatarText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+  },
+  profileInfo: {
+    flex: 1,
+  },
+  profileName: {
+    fontSize: 20,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  profileEmail: {
+    fontSize: 14,
+  },
+  menuItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 16,
+    borderTopWidth: 1,
+  },
+  menuItemText: {
+    fontSize: 16,
+  },
+  menuItemArrow: {
+    fontSize: 24,
+    fontWeight: '300',
+  },
+  logoutButton: {
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
+  },
+  logoutButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
     fontSize: 14,
     lineHeight: 20,
   },

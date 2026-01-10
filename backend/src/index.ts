@@ -40,11 +40,13 @@ import authRoutes from './routes/auth.routes';
 import violationRoutes from './routes/violation.routes';
 import notificationRoutes from './routes/notification.routes';
 import gamificationRoutes from './routes/gamification.routes';
+import adminRoutes from './routes/admin';
 
 app.use('/api/auth', authRoutes);
 app.use('/api/violations', violationRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/gamification', gamificationRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Middleware de erro global
 app.use(errorHandler);

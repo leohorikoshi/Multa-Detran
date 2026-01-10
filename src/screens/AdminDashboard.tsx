@@ -18,11 +18,10 @@ import { ViolationStatus } from '../components/ui';
 
 type AdminDashboardNavigationProp = NativeStackNavigationProp<RootStackParamList, 'AdminDashboard'>;
 
-export const AdminDashboard = () => {
+export const AdminDashboard = ({ navigation }: { navigation?: any }) => {
   const [violations, setViolations] = useState<Violation[]>([]);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const navigation = useNavigation<AdminDashboardNavigationProp>();
 
   const loadViolations = async () => {
     try {
@@ -46,7 +45,9 @@ export const AdminDashboard = () => {
   }, []);
 
   const handleViolationPress = (violation: Violation) => {
-    navigation.navigate('ViolationDetails', { violationId: violation._id });
+    if (navigation) {
+      navigation.navigate('ViolationDetails', { violationId: violation._id });
+    }
   };
 
   const renderViolationItem = ({ item }: { item: Violation }) => (
@@ -70,6 +71,11 @@ export const AdminDashboard = () => {
 
   return (
     <View style={styles.container}>
+      {navigation && (
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <Text style={styles.backButtonText}>← Voltar</Text>
+        </TouchableOpacity>
+      )}
       <Text style={styles.title}>Painel Administrativo</Text>
 
       <FlatList
@@ -94,6 +100,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+  },
+  backButton: {
+    padding: 16,
+    paddingBottom: 0,
+  },
+  backButtonText: {
+    color: '#1a73e8',
+    fontSize: 16,
+    fontWeight: '600',
   },
   title: {
     fontSize: 20,

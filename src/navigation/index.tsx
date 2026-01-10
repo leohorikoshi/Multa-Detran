@@ -3,7 +3,6 @@ import { NavigationContainer, useNavigationContainerRef } from '@react-navigatio
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 import { useAppSelector } from '../hooks/useRedux';
-// import { useInitializeAuth } from '../hooks/useInitializeAuth'; // DESABILITADO - causa erro na web
 
 // Telas não autenticadas
 import { WelcomeScreen } from '../screens/WelcomeScreen';
@@ -16,67 +15,18 @@ import { ReportViolationScreen } from '../screens/ReportViolationScreen';
 import { MyReportsScreen } from '../screens/MyReportsScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import AdminDashboard from '../screens/AdminDashboard';
-import HeatmapScreen from '../screens/HeatmapScreen'; // React Native vai escolher .web.tsx na web automaticamente
-import { Platform, View, Text, StyleSheet } from 'react-native';
+import HeatmapScreen from '../screens/HeatmapScreen';
+import AdminUsersScreen from '../screens/AdminUsersScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-const linking = {
-  prefixes: ['http://localhost:8081', 'https://localhost:8081'],
-  config: {
-    screens: {
-      Welcome: '',
-      Login: 'login',
-      Register: 'register',
-      Home: 'home',
-      ReportViolation: 'report',
-      MyReports: 'my-reports',
-      Settings: 'settings',
-      HeatmapScreen: 'heatmap',
-      AdminDashboard: 'dashboard',
-    },
-  },
-};
-
 export const Navigation = () => {
   const { token } = useAppSelector((state) => state.auth);
-  const navigationRef = useNavigationContainerRef();
   
   console.log('🔄 Navigation - Token:', token ? 'Presente' : 'Ausente');
 
-  // Redirecionar automaticamente quando o token mudar
-  useEffect(() => {
-    console.log('🔄 useEffect disparado - Token:', token ? 'Presente' : 'Ausente');
-    
-    if (!token) {
-      console.log('⚠️ Sem token - Permanece na tela atual');
-      return;
-    }
-    
-    // Aguardar um pouco para garantir que o navigation está montado
-    const timer = setTimeout(() => {
-      if (navigationRef.current) {
-        console.log('✅ Token presente - Navegando para Home');
-        try {
-          navigationRef.current.navigate('Home' as never);
-        } catch (error) {
-          console.error('❌ Erro ao navegar:', error);
-        }
-      } else {
-        console.log('⚠️ navigationRef.current não existe ainda');
-      }
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [token]); // Depende apenas do token - navigationRef causa loop
-
   return (
-    <NavigationContainer 
-      ref={navigationRef}
-      linking={linking}
-      onStateChange={(state) => {
-        console.log('📍 Navigation state:', state);
-      }}
+    <NavigationContainer
       onReady={() => console.log('🚀 NavigationContainer pronto!')}
     >
       <Stack.Navigator
@@ -152,6 +102,10 @@ export const Navigation = () => {
               backgroundColor: '#1a73e8',
             },
           }}
+        />
+        <Stack.Screen
+          name="AdminUsers"
+          component={AdminUsersScreen}
         />
       </Stack.Navigator>
     </NavigationContainer>

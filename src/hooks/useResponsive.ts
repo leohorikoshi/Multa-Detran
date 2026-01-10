@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Dimensions, Platform } from 'react-native';
+import { Dimensions } from 'react-native';
+import { isWeb as platformIsWeb } from '../utils/platform';
 
 interface ResponsiveBreakpoints {
   isMobile: boolean;
@@ -29,7 +30,7 @@ export const useResponsive = (): ResponsiveBreakpoints => {
   }, []);
 
   const { width, height } = dimensions;
-  const isWeb = Platform.OS === 'web';
+  const isWeb = platformIsWeb;
 
   // Breakpoints
   const isMobile = width < 768;

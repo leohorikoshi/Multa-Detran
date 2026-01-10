@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { combineReducers } from '@reduxjs/toolkit';
 import authReducer from './slices/authSlice';
 import violationsReducer from './slices/violationsSlice';
-import { Platform } from 'react-native';
+import { isWeb } from '../utils/platform';
 
 // Storage para web usa localStorage
 const webStorage = {
@@ -32,7 +32,7 @@ const webStorage = {
 };
 
 // Usar localStorage na web, AsyncStorage no mobile
-const storage = Platform.OS === 'web' ? webStorage : AsyncStorage;
+const storage = isWeb ? webStorage : AsyncStorage;
 
 // Configuração de persistência
 const persistConfig = {

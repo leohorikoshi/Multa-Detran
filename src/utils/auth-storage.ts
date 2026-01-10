@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Platform } from 'react-native';
+import { isWeb } from './platform';
 
 const AUTH_TOKEN_KEY = '@DetranDenuncia:token';
 const REFRESH_TOKEN_KEY = '@DetranDenuncia:refreshToken';
@@ -8,7 +8,7 @@ const USER_DATA_KEY = '@DetranDenuncia:user';
 // Helper para funcionar tanto na web quanto no mobile
 const storage = {
   async setItem(key: string, value: string): Promise<void> {
-    if (Platform.OS === 'web') {
+    if (isWeb) {
       localStorage.setItem(key, value);
     } else {
       await AsyncStorage.setItem(key, value);
@@ -16,7 +16,7 @@ const storage = {
   },
   
   async getItem(key: string): Promise<string | null> {
-    if (Platform.OS === 'web') {
+    if (isWeb) {
       return localStorage.getItem(key);
     } else {
       return await AsyncStorage.getItem(key);
@@ -24,7 +24,7 @@ const storage = {
   },
   
   async removeItem(key: string): Promise<void> {
-    if (Platform.OS === 'web') {
+    if (isWeb) {
       localStorage.removeItem(key);
     } else {
       await AsyncStorage.removeItem(key);
@@ -32,7 +32,7 @@ const storage = {
   },
   
   async clear(): Promise<void> {
-    if (Platform.OS === 'web') {
+    if (isWeb) {
       localStorage.clear();
     } else {
       await AsyncStorage.clear();

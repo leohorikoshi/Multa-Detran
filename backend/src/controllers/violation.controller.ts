@@ -12,7 +12,21 @@ interface RequestWithUser extends Request {
   };
 }
 
-interface ViolationRequest extends RequestWithUser, ImageValidationRequest {}
+interface ViolationRequest extends Request {
+  user?: {
+    id: string;
+    _id: string;
+    role: string;
+    name: string;
+    email: string;
+  };
+  imageValidation?: {
+    confidence: number;
+    flags: string[];
+    hash: string;
+  };
+  file?: Express.Multer.File;
+}
 
 export const createViolation = async (req: ViolationRequest, res: Response): Promise<Response> => {
   try {

@@ -1,16 +1,15 @@
 // Configuração da API
-// Para desenvolvimento local:
-// - Web: use localhost
-// - Mobile: use o IP da sua máquina na rede local
-import { Platform } from 'react-native';
-
 const getApiUrl = () => {
+  // Detecta ambiente
+  const isWeb = typeof window !== 'undefined' && typeof document !== 'undefined';
+  
   if (!__DEV__) {
-    return 'https://api.detrandenuncia.gov.br/api';
+    // PRODUÇÃO - Substitua pela URL do Render após deploy
+    return 'https://detran-api.onrender.com/api';
   }
   
-  // Em desenvolvimento
-  if (Platform.OS === 'web') {
+  // DESENVOLVIMENTO
+  if (isWeb) {
     return 'http://localhost:3000/api';
   }
   
@@ -23,7 +22,7 @@ export const API_BASE_URL = getApiUrl();
 
 export const VIOLATION_TYPES = [
   'Estacionamento irregular',
-  'Excesso de velocidade',
+  'Parada em cima da faixa no farol',
   'Avanço de sinal vermelho',
   'Uso do celular ao volante',
   'Transporte irregular de passageiros',
